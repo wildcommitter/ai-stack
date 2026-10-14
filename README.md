@@ -37,6 +37,7 @@ ai-stack/
 │   ├── llama-swap.yaml           # LLM model definitions / swap rules
 │   └── searxng/settings.yml.example
 ├── services/
+│   ├── llm/                      # Dockerfile for the llamacpp-rocm image
 │   ├── comfyui/                  # Dockerfile, model downloader, WebUI tool installers
 │   ├── mcp-search/               # SearXNG-backed MCP server
 │   └── kali-mcp/                 # Kali sandbox image + MCP bridge (own README)

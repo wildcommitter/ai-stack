@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1
+
+# --- llama-swap: pinned official release binary, sha256-verified ---
+# (v263's go.mod needs Go 1.27, so `go install` on golang:1.23 no longer works)
+FROM docker.io/library/alpine:3.20 AS lsbuild
+ARG LLAMA_SWAP_VERSION=263
+ARG LLAMA_SWAP_SHA256=9f561442a43ed71043105891a10a41019efdc8c023f5a3c807bcf12fbd2a048d
+RUN wget -qO /tmp/ls.tgz "https://github.com/mostlygeek/llama-swap/releases/download/v${LLAMA_SWAP_VERSION}/llama-swap_${LLAMA_SWAP_VERSION}_linux_amd64.tar.gz" \
+ && echo "${LLAMA_SWAP_SHA256}  /tmp/ls.tgz" | sha256sum -c - \
+ && mkdir -p /go/bin && tar -xzf /tmp/ls.tgz -C /go/bin llama-swap \
+ && chmod +x /go/bin/llama-swap
+
+# --- llama.cpp built natively for RDNA4 / gfx1201 ---
+FROM docker.io/rocm/dev-ubuntu-24.04:7.2.1-complete
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git cmake build-essential libcurl4-openssl-dev ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp /opt/llama.cpp
+WORKDIR /opt/llama.cpp
+RUN HIPCXX="$(hipconfig -l)/clang" HIP_PATH="$(hipconfig -R)" \
+    cmake -S . -B build \
+      -DGGML_HIP=ON -DAMDGPU_TARGETS=gfx1201 -DCMAKE_BUILD_TYPE=Release \
+ && cmake --build build --config Release -j"$(nproc)" --target llama-server
+COPY --from=lsbuild /go/bin/llama-swap /usr/local/bin/llama-swap
+ENV PATH=/opt/llama.cpp/build/bin:$PATH
+EXPOSE 8080
+ENTRYPOINT ["llama-swap"]
+CMD ["-config","/config/llama-swap.yaml","-listen","0.0.0.0:8080"]
