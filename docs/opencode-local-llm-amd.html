@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use opencode with a Local AMD LLM (ROCm): Config &amp; MCP Tools | ai-stack</title>
+<meta name="description" content="Connect the opencode terminal AI coding agent to a local LLM running on an AMD Radeon GPU (ROCm) — a ready-to-paste opencode.json with an OpenAI-compatible provider and MCP tool servers. No cloud API, no CUDA.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/opencode-local-llm-amd.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Use opencode with a Local AMD LLM (ROCm): Config &amp; MCP Tools">
+<meta property="og:description" content="Connect the opencode terminal AI coding agent to a local LLM running on an AMD Radeon GPU (ROCm) — a ready-to-paste opencode.json with an OpenAI-compatible provider and MCP tool servers. No cloud API, no CUDA.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/opencode-local-llm-amd.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Use opencode with a Local AMD LLM (ROCm): Config & MCP Tools", "description": "Connect the opencode terminal AI coding agent to a local LLM running on an AMD Radeon GPU (ROCm) \u2014 a ready-to-paste opencode.json with an OpenAI-compatible provider and MCP tool servers. No cloud API, no CUDA.", "url": "https://wildcommitter.github.io/ai-stack/opencode-local-llm-amd.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/opencode-local-llm-amd.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can opencode use a local LLM instead of a cloud API?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. opencode supports any OpenAI-compatible endpoint. Point its provider baseURL at a local llama.cpp/llama-swap server (e.g. http://localhost:8080/v1) and it runs fully offline."}}, {"@type": "Question", "name": "How do I connect opencode to a local model on an AMD GPU?", "acceptedAnswer": {"@type": "Answer", "text": "Add a provider using @ai-sdk/openai-compatible with baseURL set to your llama-swap endpoint, and list your model ids. The model runs on AMD ROCm; opencode doesn't care about the GPU vendor."}}, {"@type": "Question", "name": "Does opencode need an API key for a local model?", "acceptedAnswer": {"@type": "Answer", "text": "No real key is needed, but the field must be non-empty \u2014 use a placeholder like sk-local. The request never leaves your machine."}}, {"@type": "Question", "name": "How do I give opencode tools like web search or a browser?", "acceptedAnswer": {"@type": "Answer", "text": "Register MCP servers in the mcp section of opencode.json with type remote and the server URL (e.g. web search on http://localhost:8765/mcp, a headless browser on http://localhost:8931/mcp)."}}, {"@type": "Question", "name": "Which model should I use with opencode locally?", "acceptedAnswer": {"@type": "Answer", "text": "Any instruct/coding model your stack serves. A 27B at Q6_K runs well on a 32GB AMD card; a smaller coder model is faster for autocomplete. List whatever curl localhost:8080/v1/models returns."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>Use opencode with a Local AMD LLM (ROCm): Config & MCP Tools</h1>
+<p class="lede">opencode can run entirely on your local AMD GPU. Here's a copy-paste opencode.json that wires it to your llama-swap model and the stack's MCP tools.</p>
+<p><a href="https://opencode.ai">opencode</a> is a terminal AI coding agent that speaks the OpenAI-compatible API — so it can drive your <strong>local</strong> model on an AMD GPU instead of a paid cloud API. Point it at llama-swap, add the stack's MCP tool servers, and your coding agent runs entirely on your own hardware.</p>
+
+<h2>Drop-in opencode config</h2>
+<p>Save this as <code>~/.config/opencode/opencode.json</code> (global) or <code>opencode.json</code> in your project root:</p>
+<pre><code>{
+  &quot;$schema&quot;: &quot;https://opencode.ai/config.json&quot;,
+  &quot;provider&quot;: {
+    &quot;ai-stack&quot;: {
+      &quot;npm&quot;: &quot;@ai-sdk/openai-compatible&quot;,
+      &quot;name&quot;: &quot;ai-stack (local AMD / ROCm)&quot;,
+      &quot;options&quot;: {
+        &quot;baseURL&quot;: &quot;http://localhost:8080/v1&quot;,
+        &quot;apiKey&quot;: &quot;sk-local&quot;
+      },
+      &quot;models&quot;: {
+        &quot;qwen3.8-27b-heretic&quot;: {
+          &quot;name&quot;: &quot;Qwen3.8-27B (local, ROCm)&quot;,
+          &quot;limit&quot;: { &quot;context&quot;: 131072, &quot;output&quot;: 32768 }
+        }
+      }
+    }
+  },
+  &quot;mcp&quot;: {
+    &quot;web-search&quot;: { &quot;type&quot;: &quot;remote&quot;, &quot;url&quot;: &quot;http://localhost:8765/mcp&quot; },
+    &quot;browser&quot;:    { &quot;type&quot;: &quot;remote&quot;, &quot;url&quot;: &quot;http://localhost:8931/mcp&quot; }
+  }
+}</code></pre>
+<div class="note"><strong>No cloud key needed.</strong> <code>baseURL</code> points at llama-swap's local OpenAI endpoint; <code>apiKey</code> is just a non-empty placeholder. Swap the model id for whatever your stack serves (<code>curl localhost:8080/v1/models</code>).</div>
+
+<h2>What each part does</h2>
+<ul class="feat">
+<li><strong>provider.ai-stack</strong> — registers your local llama.cpp/llama-swap server as an OpenAI-compatible provider via <code>@ai-sdk/openai-compatible</code>.</li>
+<li><strong>options.baseURL</strong> — <code>http://localhost:8080/v1</code>, the llama-swap endpoint (ROCm under the hood).</li>
+<li><strong>models</strong> — the local model(s) and their context/output limits.</li>
+<li><strong>mcp</strong> — remote MCP tool servers from the stack (web search on 8765, headless browser on 8931). Add more, e.g. a sandboxed shell on <code>http://localhost:8099/mcp</code>.</li>
+</ul>
+
+<h2>Run it</h2>
+<pre><code># make sure the stack is up
+systemctl --user start ai-stack.service
+# then just run opencode in your project
+opencode</code></pre>
+<p>Pick the <em>ai-stack</em> provider/model in opencode and your coding agent is now local, private, and CUDA-free. MCP tools you listed are available to the agent automatically.</p>
+<h2>Technical FAQ</h2>
+<details><summary>Can opencode use a local LLM instead of a cloud API?</summary><p>Yes. opencode supports any OpenAI-compatible endpoint. Point its provider baseURL at a local llama.cpp/llama-swap server (e.g. http://localhost:8080/v1) and it runs fully offline.</p></details>
+<details><summary>How do I connect opencode to a local model on an AMD GPU?</summary><p>Add a provider using @ai-sdk/openai-compatible with baseURL set to your llama-swap endpoint, and list your model ids. The model runs on AMD ROCm; opencode doesn&#x27;t care about the GPU vendor.</p></details>
+<details><summary>Does opencode need an API key for a local model?</summary><p>No real key is needed, but the field must be non-empty — use a placeholder like sk-local. The request never leaves your machine.</p></details>
+<details><summary>How do I give opencode tools like web search or a browser?</summary><p>Register MCP servers in the mcp section of opencode.json with type remote and the server URL (e.g. web search on http://localhost:8765/mcp, a headless browser on http://localhost:8931/mcp).</p></details>
+<details><summary>Which model should I use with opencode locally?</summary><p>Any instruct/coding model your stack serves. A 27B at Q6_K runs well on a 32GB AMD card; a smaller coder model is faster for autocomplete. List whatever curl localhost:8080/v1/models returns.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="open-webui-amd-setup.html">Open WebUI with a local AMD LLM →</a>
+<a href="llama-cpp-rocm-gfx1201.html">llama.cpp on AMD ROCm (gfx1201) →</a>
+<a href="run-27b-llm-on-amd-32gb.html">Run a 27B LLM on a 32GB AMD GPU →</a>
+<a href="r9700-llm-benchmarks.html">AMD R9700 LLM benchmarks →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>
