@@ -55,9 +55,27 @@ via `services/kali-mcp/scripts/build.sh`).
 git clone <your-fork> ai-stack && cd ai-stack
 ./scripts/install.sh          # writes .env + secrets, installs systemd units, makes the volume
 $EDITOR .env                  # set GPU GIDs + model paths
-# download models into MODELS_DIR / COMFYUI_MODELS_DIR (see services/comfyui/download-models.sh)
+./download-model.sh list      # see the model catalog
+./download-model.sh all <HF_TOKEN>   # fetch every model into MODELS_DIR / COMFYUI_MODELS_DIR
 systemctl --user start ai-stack.service
 ```
+
+### Models (`download-model.sh`)
+
+The model files live outside the repo (at the `.env` paths). `download-model.sh`
+knows each one's Hugging Face source and destination:
+
+```bash
+./download-model.sh list                 # catalog with ids, numbers, on-disk status
+./download-model.sh 1 <HF_TOKEN>          # by list number
+./download-model.sh llm-heretic <HF_TOKEN># by id
+./download-model.sh comfyui <HF_TOKEN>    # a group (llm | comfyui | all)
+```
+
+The HF token is optional for public models, required for gated ones (2nd arg,
+`-t`, or `HF_TOKEN`). Downloads are resumable and **sha256-verified** against
+HF's published checksum; an already-correct file is skipped. A size-mismatched
+file is re-downloaded fresh (pass `--resume` to continue a genuine partial).
 
 `ai-stack.service` pulls in `kali-sandbox.service` first, then runs
 `podman-compose up -d`. Everything comes back on reboot (linger is enabled by
