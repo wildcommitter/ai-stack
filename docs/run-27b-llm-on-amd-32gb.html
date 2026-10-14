@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA) | ai-stack</title>
+<meta name="description" content="Step-by-step: run a 27-billion-parameter LLM on a single 32GB AMD Radeon GPU with llama.cpp on ROCm — quantization, context length, KV-cache and VRAM math. No NVIDIA, no CUDA.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/run-27b-llm-on-amd-32gb.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA)">
+<meta property="og:description" content="Step-by-step: run a 27-billion-parameter LLM on a single 32GB AMD Radeon GPU with llama.cpp on ROCm — quantization, context length, KV-cache and VRAM math. No NVIDIA, no CUDA.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/run-27b-llm-on-amd-32gb.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA)", "description": "Step-by-step: run a 27-billion-parameter LLM on a single 32GB AMD Radeon GPU with llama.cpp on ROCm \u2014 quantization, context length, KV-cache and VRAM math. No NVIDIA, no CUDA.", "url": "https://wildcommitter.github.io/ai-stack/run-27b-llm-on-amd-32gb.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/run-27b-llm-on-amd-32gb.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can a 27B model really run on a 32GB AMD GPU?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. At Q6_K the weights are ~21 GB; with an 8-bit KV cache even a 128K context fits inside 32 GB on a single card."}}, {"@type": "Question", "name": "Do I need CUDA or an NVIDIA GPU?", "acceptedAnswer": {"@type": "Answer", "text": "No. This runs on AMD ROCm with llama.cpp. No CUDA is involved."}}, {"@type": "Question", "name": "What quantization should I use?", "acceptedAnswer": {"@type": "Answer", "text": "Q6_K is a strong quality/size balance for 27B on 32 GB. Drop to Q5_K_M if you need more headroom for context or image models."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA)</h1>
+<p class="lede">A 27B model fits comfortably on a 32GB AMD card if you pick the right quant and KV-cache settings. Here's the exact recipe used in ai-stack.</p>
+<h2>The VRAM math</h2>
+<p>A 27B model at <strong>Q6_K</strong> weighs about <strong>21 GB</strong> on disk and loads into roughly the same amount of VRAM. On a 32 GB card that leaves ~11 GB for the KV cache and compute buffers — plenty, if you quantize the cache.</p>
+<table><tr><th>Component</th><th>~VRAM</th></tr>
+<tr><td>Weights (Q6_K, 27B)</td><td>~21 GB</td></tr>
+<tr><td>KV cache @ 128K ctx, q8_0 K/V</td><td>~6–8 GB</td></tr>
+<tr><td>Compute / overhead</td><td>~1–2 GB</td></tr></table>
+<h2>The llama.cpp command</h2>
+<p>Offload all layers to the GPU (<code>-ngl 99</code>), enable Flash Attention, and quantize the KV cache to <code>q8_0</code> so a 128K context still fits:</p>
+<pre><code>llama-server --host 127.0.0.1 --port 8078 \
+  -m /models/your-27b-Q6_K.gguf \
+  -ngl 99 -fa on --jinja \
+  -c 131072 \
+  --cache-type-k q8_0 --cache-type-v q8_0 \
+  --parallel 1</code></pre>
+<div class="note"><strong>Tip:</strong> if you're VRAM-tight, drop context to <code>-c 32768</code> or move to <strong>Q5_K_M</strong> (~19.6 GB) before touching <code>-ngl</code> — keeping all layers on the GPU matters most for speed.</div>
+<h2>Speed: speculative decoding (MTP)</h2>
+<p>Some 27B GGUF builds ship an embedded multi-token-prediction (MTP) draft head. llama.cpp can use it for speculative decoding, which roughly doubles tokens/sec for free:</p>
+<pre><code>  --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.65</code></pre>
+<h2>Running it hands-free</h2>
+<p>In <a href="https://github.com/wildcommitter/ai-stack">ai-stack</a>, this model is managed by <strong>llama-swap</strong>: it loads on the first chat request and unloads after an idle timeout so the GPU frees up for image generation. See the companion guide on <a href="llm-and-image-generation-same-gpu.html">sharing one GPU between an LLM and image models</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Can a 27B model really run on a 32GB AMD GPU?</summary><p>Yes. At Q6_K the weights are ~21 GB; with an 8-bit KV cache even a 128K context fits inside 32 GB on a single card.</p></details>
+<details><summary>Do I need CUDA or an NVIDIA GPU?</summary><p>No. This runs on AMD ROCm with llama.cpp. No CUDA is involved.</p></details>
+<details><summary>What quantization should I use?</summary><p>Q6_K is a strong quality/size balance for 27B on 32 GB. Drop to Q5_K_M if you need more headroom for context or image models.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="llama-cpp-rocm-gfx1201.html">Running llama.cpp on AMD ROCm (RDNA4 / gfx1201) →</a>
+<a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA →</a>
+<a href="llm-and-image-generation-same-gpu.html">Run an LLM and Image Generation on One GPU Without Running Out of VRAM →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>

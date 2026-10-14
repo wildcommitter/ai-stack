@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running llama.cpp on AMD ROCm (RDNA4 / gfx1201) | ai-stack</title>
+<meta name="description" content="How to run llama.cpp on an AMD Radeon GPU with ROCm on RDNA4 (gfx1201): container device passthrough, render/video groups, HIP_VISIBLE_DEVICES, and on-demand model swapping.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/llama-cpp-rocm-gfx1201.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Running llama.cpp on AMD ROCm (RDNA4 / gfx1201)">
+<meta property="og:description" content="How to run llama.cpp on an AMD Radeon GPU with ROCm on RDNA4 (gfx1201): container device passthrough, render/video groups, HIP_VISIBLE_DEVICES, and on-demand model swapping.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/llama-cpp-rocm-gfx1201.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Running llama.cpp on AMD ROCm (RDNA4 / gfx1201)", "description": "How to run llama.cpp on an AMD Radeon GPU with ROCm on RDNA4 (gfx1201): container device passthrough, render/video groups, HIP_VISIBLE_DEVICES, and on-demand model swapping.", "url": "https://wildcommitter.github.io/ai-stack/llama-cpp-rocm-gfx1201.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/llama-cpp-rocm-gfx1201.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What GPU architecture is RDNA4 for ROCm?", "acceptedAnswer": {"@type": "Answer", "text": "RDNA4 Radeon cards (e.g. the AI PRO R9700) report as gfx1201. Use a ROCm/llama.cpp build targeting gfx1201."}}, {"@type": "Question", "name": "Why do I need the render and video groups?", "acceptedAnswer": {"@type": "Answer", "text": "ROCm accesses /dev/kfd and /dev/dri; the container user must be in the host's render and video groups to use them."}}, {"@type": "Question", "name": "Can I run multiple models without reloading constantly?", "acceptedAnswer": {"@type": "Answer", "text": "Yes \u2014 llama-swap keeps lightweight models loaded and swaps heavy ones on demand, with per-model idle TTLs."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>Running llama.cpp on AMD ROCm (RDNA4 / gfx1201)</h1>
+<p class="lede">Getting llama.cpp talking to an AMD RDNA4 card under rootless Podman comes down to a few device and permission details. Here they are.</p>
+<h2>GPU passthrough into the container</h2>
+<p>ROCm needs two device nodes and membership in the <code>render</code> and <code>video</code> groups. In a Podman/compose service:</p>
+<pre><code>devices: ["/dev/kfd", "/dev/dri"]
+group_add: ["&lt;render-gid&gt;", "&lt;video-gid&gt;"]   # getent group render / video
+security_opt: ["seccomp=unconfined"]
+environment: ["HIP_VISIBLE_DEVICES=0"]</code></pre>
+<p><code>HIP_VISIBLE_DEVICES=0</code> pins to the discrete GPU (check <code>rocm-smi</code> if an iGPU also appears). RDNA4 cards report as <strong>gfx1201</strong>; build or pull a ROCm llama.cpp image targeting that arch.</p>
+<h2>Verify ROCm sees the card</h2>
+<pre><code>rocm-smi                 # on the host
+podman exec &lt;llm&gt; rocminfo | grep gfx   # inside the container -> gfx1201</code></pre>
+<h2>On-demand model swapping with llama-swap</h2>
+<p><strong>llama-swap</strong> sits in front of llama.cpp and exposes an OpenAI-compatible API, loading each model on first request and unloading it after a TTL. That's what lets a chat model and a coder model coexist, and frees VRAM when idle:</p>
+<pre><code>models:
+  "chat-27b":
+    cmd: llama-server -m /models/chat.gguf -ngl 99 -fa on -c 131072 ...
+    ttl: 600          # unload after 10 min idle
+  "coder-1.5b":
+    cmd: llama-server -m /models/coder.gguf -ngl 99 -fa on -c 16384 ...
+    ttl: 1800</code></pre>
+<div class="note">Point any OpenAI-compatible client (like Open WebUI) at <code>http://localhost:8080/v1</code> — llama-swap handles the rest.</div>
+<h2>FAQ</h2>
+<details><summary>What GPU architecture is RDNA4 for ROCm?</summary><p>RDNA4 Radeon cards (e.g. the AI PRO R9700) report as gfx1201. Use a ROCm/llama.cpp build targeting gfx1201.</p></details>
+<details><summary>Why do I need the render and video groups?</summary><p>ROCm accesses /dev/kfd and /dev/dri; the container user must be in the host&#x27;s render and video groups to use them.</p></details>
+<details><summary>Can I run multiple models without reloading constantly?</summary><p>Yes — llama-swap keeps lightweight models loaded and swaps heavy ones on demand, with per-model idle TTLs.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="run-27b-llm-on-amd-32gb.html">How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA) →</a>
+<a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA →</a>
+<a href="llm-and-image-generation-same-gpu.html">Run an LLM and Image Generation on One GPU Without Running Out of VRAM →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>

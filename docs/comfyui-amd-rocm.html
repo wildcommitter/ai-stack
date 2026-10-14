@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA | ai-stack</title>
+<meta name="description" content="Run ComfyUI for local image generation on an AMD Radeon GPU with ROCm — device passthrough and low-VRAM offloading so it shares a card with your LLM. No NVIDIA, no CUDA.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/comfyui-amd-rocm.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA">
+<meta property="og:description" content="Run ComfyUI for local image generation on an AMD Radeon GPU with ROCm — device passthrough and low-VRAM offloading so it shares a card with your LLM. No NVIDIA, no CUDA.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/comfyui-amd-rocm.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA", "description": "Run ComfyUI for local image generation on an AMD Radeon GPU with ROCm \u2014 device passthrough and low-VRAM offloading so it shares a card with your LLM. No NVIDIA, no CUDA.", "url": "https://wildcommitter.github.io/ai-stack/comfyui-amd-rocm.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/comfyui-amd-rocm.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does ComfyUI work on AMD without CUDA?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, ComfyUI runs on AMD ROCm. No NVIDIA GPU or CUDA is required."}}, {"@type": "Question", "name": "How do I stop ComfyUI from hogging all my VRAM?", "acceptedAnswer": {"@type": "Answer", "text": "Launch with --cache-none to offload models between nodes, keeping peak VRAM low enough to share the card with an LLM."}}, {"@type": "Question", "name": "Can I generate images from a chat interface?", "acceptedAnswer": {"@type": "Answer", "text": "Yes \u2014 Open WebUI can call ComfyUI as a tool, handing VRAM back and forth with the LLM automatically."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA</h1>
+<p class="lede">ComfyUI runs well on AMD ROCm. The trick to coexisting with a big LLM on one card is aggressive model offloading.</p>
+<h2>Launch flags that keep VRAM low</h2>
+<p>Run ComfyUI with <code>--cache-none</code> so models are offloaded between nodes instead of kept resident — peak VRAM drops dramatically, which is what lets image generation share a GPU with a large language model:</p>
+<pre><code>python main.py --listen 0.0.0.0 --port 8188 --cache-none</code></pre>
+<h2>Same GPU passthrough as llama.cpp</h2>
+<pre><code>devices: ["/dev/kfd", "/dev/dri"]
+group_add: ["&lt;render-gid&gt;", "&lt;video-gid&gt;"]
+environment: ["HIP_VISIBLE_DEVICES=0"]</code></pre>
+<h2>Driving it from chat</h2>
+<p>In <a href="https://github.com/wildcommitter/ai-stack">ai-stack</a>, Open WebUI calls ComfyUI as a tool: it first unloads the LLM to free VRAM, submits the image job, then frees ComfyUI's VRAM so chat can resume. You get text-to-image and vision from the same chat box, all local.</p>
+<div class="note">Image models (diffusion transformer, text encoders, VAE) are large — keep them on fast storage and out of your git repo; fetch them with a checksum-verifying downloader.</div>
+<h2>FAQ</h2>
+<details><summary>Does ComfyUI work on AMD without CUDA?</summary><p>Yes, ComfyUI runs on AMD ROCm. No NVIDIA GPU or CUDA is required.</p></details>
+<details><summary>How do I stop ComfyUI from hogging all my VRAM?</summary><p>Launch with --cache-none to offload models between nodes, keeping peak VRAM low enough to share the card with an LLM.</p></details>
+<details><summary>Can I generate images from a chat interface?</summary><p>Yes — Open WebUI can call ComfyUI as a tool, handing VRAM back and forth with the LLM automatically.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="run-27b-llm-on-amd-32gb.html">How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA) →</a>
+<a href="llama-cpp-rocm-gfx1201.html">Running llama.cpp on AMD ROCm (RDNA4 / gfx1201) →</a>
+<a href="llm-and-image-generation-same-gpu.html">Run an LLM and Image Generation on One GPU Without Running Out of VRAM →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>

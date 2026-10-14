@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run an LLM and Image Generation on One GPU Without Running Out of VRAM | ai-stack</title>
+<meta name="description" content="How to run a large LLM and an image-generation model on a single GPU without out-of-memory errors: idle-TTL model unloading and VRAM handoff on AMD ROCm.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/llm-and-image-generation-same-gpu.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Run an LLM and Image Generation on One GPU Without Running Out of VRAM">
+<meta property="og:description" content="How to run a large LLM and an image-generation model on a single GPU without out-of-memory errors: idle-TTL model unloading and VRAM handoff on AMD ROCm.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/llm-and-image-generation-same-gpu.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Run an LLM and Image Generation on One GPU Without Running Out of VRAM", "description": "How to run a large LLM and an image-generation model on a single GPU without out-of-memory errors: idle-TTL model unloading and VRAM handoff on AMD ROCm.", "url": "https://wildcommitter.github.io/ai-stack/llm-and-image-generation-same-gpu.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/llm-and-image-generation-same-gpu.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can one GPU run both an LLM and Stable-Diffusion-style image generation?", "acceptedAnswer": {"@type": "Answer", "text": "Not simultaneously on a 32GB card, but yes sequentially \u2014 unload the LLM to free VRAM before image generation, then reload it after."}}, {"@type": "Question", "name": "How do I avoid CUDA/ROCm out-of-memory errors when switching tasks?", "acceptedAnswer": {"@type": "Answer", "text": "Use idle-TTL unloading and an explicit unload-before-generate step so only one large model is resident at a time."}}, {"@type": "Question", "name": "Does this need manual intervention?", "acceptedAnswer": {"@type": "Answer", "text": "No \u2014 llama-swap and the image tool handle the handoff automatically."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>Run an LLM and Image Generation on One GPU Without Running Out of VRAM</h1>
+<p class="lede">One 32GB GPU can't hold a 27B LLM and a diffusion pipeline at once. The fix is to treat VRAM as a shared resource and hand it off automatically.</p>
+<h2>The problem</h2>
+<p>A 27B LLM needs ~28 GB with its KV cache; a modern image pipeline needs several GB more. On a 32 GB card they can't coexist. Loading both means an out-of-memory crash.</p>
+<h2>The solution: automatic handoff</h2>
+<ol>
+<li><strong>Idle unload.</strong> llama-swap unloads the chat model after an idle timeout (<code>ttl: 600</code>), freeing the GPU when you stop typing.</li>
+<li><strong>Unload-before-generate.</strong> The image tool explicitly unloads the LLM before submitting a ComfyUI job.</li>
+<li><strong>Free-after-generate.</strong> After the image is produced, ComfyUI's VRAM is freed (<code>--cache-none</code> plus a free call) so chat resumes instantly.</li>
+</ol>
+<div class="note">Net result: one GPU, many workloads, no OOM, no manual juggling — the user just chats and asks for an image.</div>
+<h2>Why it matters on AMD</h2>
+<p>AMD cards give you more VRAM per dollar, but you still want to use every GB well. This handoff pattern is what makes a single mid-range AMD workstation card behave like a much more expensive setup — see <a href="run-27b-llm-on-amd-32gb.html">running a 27B LLM on 32GB</a> and <a href="comfyui-amd-rocm.html">ComfyUI on ROCm</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Can one GPU run both an LLM and Stable-Diffusion-style image generation?</summary><p>Not simultaneously on a 32GB card, but yes sequentially — unload the LLM to free VRAM before image generation, then reload it after.</p></details>
+<details><summary>How do I avoid CUDA/ROCm out-of-memory errors when switching tasks?</summary><p>Use idle-TTL unloading and an explicit unload-before-generate step so only one large model is resident at a time.</p></details>
+<details><summary>Does this need manual intervention?</summary><p>No — llama-swap and the image tool handle the handoff automatically.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="run-27b-llm-on-amd-32gb.html">How to Run a 27B LLM on a 32GB AMD GPU (ROCm, No CUDA) →</a>
+<a href="llama-cpp-rocm-gfx1201.html">Running llama.cpp on AMD ROCm (RDNA4 / gfx1201) →</a>
+<a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm: Local Image Generation Without NVIDIA →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>

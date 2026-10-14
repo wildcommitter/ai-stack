@@ -127,6 +127,16 @@ systemctl --user start ai-stack.service
   </section>
 
   <section>
+    <h2>Guides</h2>
+    <ul class="feat">
+      <li><a href="run-27b-llm-on-amd-32gb.html">Run a 27B LLM on a 32GB AMD GPU</a> — quant, context &amp; KV-cache math.</li>
+      <li><a href="llama-cpp-rocm-gfx1201.html">llama.cpp on AMD ROCm (RDNA4 / gfx1201)</a> — device passthrough &amp; model swapping.</li>
+      <li><a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm</a> — local image generation, low-VRAM.</li>
+      <li><a href="llm-and-image-generation-same-gpu.html">LLM + image gen on one GPU</a> — VRAM handoff, no OOM.</li>
+    </ul>
+  </section>
+
+  <section>
     <h2>FAQ</h2>
     <details open><summary>Can I run a local LLM on an AMD GPU without NVIDIA or CUDA?</summary>
       <p>Yes. Every component runs on AMD ROCm — llama.cpp for the LLM, ComfyUI for images — no NVIDIA card or CUDA needed.</p></details>

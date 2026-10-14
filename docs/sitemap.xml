@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://wildcommitter.github.io/ai-stack/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://wildcommitter.github.io/ai-stack/run-27b-llm-on-amd-32gb.html</loc><priority>0.8</priority></url>
+  <url><loc>https://wildcommitter.github.io/ai-stack/llama-cpp-rocm-gfx1201.html</loc><priority>0.8</priority></url>
+  <url><loc>https://wildcommitter.github.io/ai-stack/comfyui-amd-rocm.html</loc><priority>0.8</priority></url>
+  <url><loc>https://wildcommitter.github.io/ai-stack/llm-and-image-generation-same-gpu.html</loc><priority>0.8</priority></url>
 </urlset>
