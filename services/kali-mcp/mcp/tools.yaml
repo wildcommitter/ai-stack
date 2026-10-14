@@ -1,0 +1,184 @@
+# Catalog / allowlist of tools the MCP server exposes via `run_tool`.
+#
+# This is the UNION of the tool lists from the public Kali MCP servers
+# (chfle/Pentest-MCP-Server, JesseEikeland/kali-mcp, andrew-stclair/kali-mcp-server,
+# openbashok/pentest-mcp, cyberillo/kali-mcp-server and the mcp-kali-tools image)
+# plus additions that are broadly useful in red-team work.
+#
+# The descriptions below are only FALLBACKS. scripts/gen-descriptions.sh runs
+# `tldr <tool>` (tealdeer) INSIDE the container and writes mcp/descriptions.json;
+# list_tools prefers those generated descriptions and falls back to these.
+#
+# The generic `run_bash` tool can run anything; this catalog exists so an AI
+# client gets a discoverable, named, validated menu. Binaries not present in the
+# image are flagged "installed: false" by list_tools (it probes `command -v`).
+
+recon_osint:
+  theharvester: "Emails, hosts, subdomains from public sources."
+  recon-ng: "Full-featured web reconnaissance framework."
+  dmitry: "Deepmagic information gathering (whois, subdomains, ports)."
+  whois: "WHOIS registration lookups."
+  dig: "DNS lookups (BIND dig)."
+  host: "DNS lookup utility."
+  dnsrecon: "DNS enumeration (records, zone transfer, brute)."
+  dnsenum: "DNS enumeration and subdomain brute forcing."
+  dnsmap: "DNS subdomain brute forcing."
+  dnstwist: "Domain permutation engine (typosquatting/phishing detection)."
+  fierce: "DNS reconnaissance / subdomain discovery."
+  dnsx: "Fast multipurpose DNS toolkit."
+  subfinder: "Passive subdomain discovery."
+  sublist3r: "Subdomain enumeration via search engines."
+  amass: "In-depth attack-surface / subdomain mapping."
+  assetfinder: "Find domains and subdomains related to a target."
+  waybackurls: "Fetch known URLs from the Wayback Machine."
+  gau: "Fetch known URLs from multiple archive sources."
+  shodan: "Shodan CLI (needs API key)."
+  ipcalc: "IPv4 subnet / netmask calculator."
+  exiftool: "Read/write file and image metadata."
+
+discovery_scanning:
+  nmap: "Network/port/service/OS discovery and scripting (NSE)."
+  masscan: "Internet-scale asynchronous port scanner."
+  rustscan: "Fast port scanner that hands open ports to nmap."
+  naabu: "Fast SYN/CONNECT port scanner."
+  netdiscover: "Active/passive ARP host discovery."
+  arp-scan: "Discover hosts on the local network via ARP."
+  fping: "Ping many hosts in parallel."
+  hping3: "Custom TCP/IP packet crafting and probing."
+  nping: "Packet generation and response analysis (nmap suite)."
+  traceroute: "Trace network path to a host."
+  mtr: "Combined traceroute + ping diagnostics."
+  ike-scan: "IKE/IPsec VPN discovery and fingerprinting."
+
+vuln_scanning:
+  nikto: "Web server vulnerability scanner."
+  nuclei: "Template-based vulnerability scanner."
+  wpscan: "WordPress vulnerability scanner."
+  joomscan: "Joomla vulnerability scanner."
+  wapiti: "Web application vulnerability scanner."
+  lynis: "Security auditing / hardening scanner for hosts."
+  searchsploit: "Offline Exploit-DB search."
+  nbtscan: "NetBIOS name scanner."
+  onesixtyone: "Fast SNMP community-string scanner."
+
+tls_crypto:
+  sslscan: "Query SSL/TLS services and ciphers."
+  sslyze: "Fast TLS configuration analyzer."
+  testssl.sh: "TLS/SSL configuration and vulnerability checker."
+  ssh-audit: "SSH server/client configuration auditing."
+  openssl: "TLS/crypto toolkit."
+
+web_app:
+  gobuster: "Directory/DNS/vhost brute forcing."
+  ffuf: "Fast web fuzzer (content, params, vhosts)."
+  feroxbuster: "Recursive content discovery."
+  dirb: "Web content scanner."
+  dirsearch: "Web path brute forcer."
+  wfuzz: "Web application fuzzer."
+  whatweb: "Web technology fingerprinting."
+  wafw00f: "Identify and fingerprint web application firewalls."
+  httpx: "Fast HTTP probing / tech detection."
+  katana: "Crawling and spidering framework."
+  hakrawler: "Fast web crawler for endpoint discovery."
+  arjun: "HTTP parameter discovery."
+  parsero: "robots.txt disallowed-entry auditor."
+  lbd: "Load-balancer detector."
+  davtest: "Test WebDAV servers for upload/exec."
+  cadaver: "Command-line WebDAV client."
+  sqlmap: "Automated SQL injection detection and exploitation."
+  commix: "Automated command-injection testing."
+  xsser: "Cross-site scripting detection framework."
+  dalfox: "Fast XSS scanner / parameter analyzer."
+  jwt_tool: "Test and manipulate JSON Web Tokens."
+  cewl: "Custom wordlist generator from a site."
+
+enum_services:
+  enum4linux: "SMB/Samba enumeration."
+  enum4linux-ng: "Modern SMB/Samba enumeration."
+  smbmap: "Enumerate SMB shares and permissions."
+  smbclient: "SMB/CIFS client."
+  rpcclient: "Query MS-RPC / Samba endpoints."
+  rpcinfo: "Report RPC (portmapper) services."
+  nmblookup: "NetBIOS name lookups."
+  showmount: "List NFS exports/mounts."
+  ldapsearch: "Query LDAP / Active Directory directories."
+  snmpwalk: "SNMP tree enumeration."
+  snmpget: "Fetch a single SNMP OID."
+  snmptable: "Render SNMP tables."
+  smtp-user-enum: "Enumerate SMTP users (VRFY/EXPN/RCPT)."
+  swaks: "Swiss-army SMTP transaction tester."
+  redis-cli: "Redis command-line client."
+  mysql: "MySQL/MariaDB client."
+  psql: "PostgreSQL client."
+
+exploitation:
+  msfconsole: "Metasploit Framework console."
+  msfvenom: "Metasploit payload generator/encoder."
+  setoolkit: "Social-Engineer Toolkit."
+  beef-xss: "Browser Exploitation Framework."
+  responder: "LLMNR/NBT-NS/MDNS poisoner and rogue auth server."
+  mitm6: "IPv6 DNS takeover (pairs with ntlmrelayx)."
+  netexec: "Network execution / AD swiss-army knife (nxc, ex-CrackMapExec)."
+  crackmapexec: "AD/network swiss-army knife (legacy name)."
+  impacket-scripts: "Impacket example scripts (secretsdump, psexec, ntlmrelayx...)."
+  evil-winrm: "WinRM shell for pentesting."
+  bloodhound-python: "Python AD data collector for BloodHound."
+  ldapdomaindump: "Dump AD info over LDAP to HTML/JSON."
+  certipy: "AD CS (certificate services) enumeration/abuse."
+  kerbrute: "Kerberos pre-auth username/password brute."
+  pypykatz: "Pure-Python mimikatz (parse LSASS/registry secrets)."
+
+password_creds:
+  hydra: "Network login brute forcer."
+  medusa: "Parallel network login brute forcer."
+  ncrack: "High-speed network auth cracking."
+  patator: "Multi-purpose brute forcer."
+  john: "John the Ripper password cracker."
+  hashcat: "GPU-accelerated password recovery."
+  hashid: "Identify hash types."
+  hash-identifier: "Identify hash types (interactive)."
+  crunch: "Wordlist generator."
+  cupp: "Common user passwords profiler."
+  fcrackzip: "Brute/dictionary cracker for ZIP archives."
+
+wireless:
+  aircrack-ng: "WEP/WPA/WPA2 cracking suite."
+  airodump-ng: "802.11 packet capture / AP discovery."
+  aireplay-ng: "802.11 packet injection."
+  airmon-ng: "Enable/disable monitor mode."
+  reaver: "WPS PIN brute force."
+  bully: "WPS brute force (alternative)."
+  wifite: "Automated wireless auditing."
+  kismet: "Wireless network detector/sniffer."
+  hcxdumptool: "Capture WPA handshakes/PMKID."
+  hcxpcapngtool: "Convert captures for hashcat."
+  bettercap: "Network attack and monitoring (MITM, Wi-Fi, BLE)."
+
+sniffing_mitm:
+  tcpdump: "Command-line packet capture."
+  tshark: "CLI Wireshark packet analysis."
+  ngrep: "grep across network traffic."
+  ettercap: "MITM attack suite."
+  mitmproxy: "Interactive HTTPS proxy."
+  arpspoof: "ARP cache poisoning (dsniff)."
+  macchanger: "View/change MAC addresses."
+
+forensics_stego:
+  binwalk: "Analyze and extract firmware / embedded files."
+  foremost: "File carving / recovery by header."
+  steghide: "Hide/extract data in images and audio."
+
+post_exploit_pivot:
+  proxychains4: "Force connections through a proxy chain."
+  chisel: "TCP/UDP tunnel over HTTP (pivoting)."
+  socat: "Multipurpose relay / socket tool."
+  ligolo-ng: "Reverse tunneling / pivoting."
+  sshuttle: "VPN-over-SSH / transparent proxy."
+  ncat: "Feature-rich netcat (nmap suite)."
+  netcat: "TCP/UDP read/write (nc)."
+
+utility:
+  curl: "HTTP client."
+  wget: "HTTP/FTP downloader."
+  jq: "JSON processor."
+  git: "Version control (clone tool repos)."

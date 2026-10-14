@@ -1,0 +1,29 @@
+use_default_settings: true
+server:
+  secret_key: "CHANGE_ME_run_openssl_rand_-hex_32"
+  limiter: false
+search:
+  formats:
+    - html
+    - json
+
+# wikidata's engine init (a SPARQL properties fetch against
+# query.wikidata.org, done once at worker startup) gets a permanent 403 from
+# this host's IP and never registers, so it just logs a traceback on every
+# restart for no benefit. Disabled to quiet that; doesn't affect other
+# engines. duckduckgo/brave/startpage/google_cse do get CAPTCHA'd or
+# rate-limited under bursty testing from a single home IP (see engine logs /
+# stats page) but recover within minutes to hours under normal, non-bursty
+# chat usage, so they're left enabled rather than cut for search coverage.
+engines:
+  - name: wikidata
+    disabled: true
+  # Default display_type is ["infobox"] only, so a canonical-topic wikipedia
+  # hit (e.g. "Lisbon") lands in the JSON `infoboxes` array, never `results`.
+  # Open WebUI's RAG client (open_webui/retrieval/web/searxng.py) only reads
+  # `results`, so it silently treated a successful wikipedia answer as "no
+  # results found" and fell back to the model's own knowledge instead of the
+  # actual search. Adding "list" makes wikipedia also emit a normal results
+  # entry.
+  - name: wikipedia
+    display_type: ["infobox", "list"]

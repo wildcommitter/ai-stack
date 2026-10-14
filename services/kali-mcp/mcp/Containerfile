@@ -1,0 +1,28 @@
+# Kali-MCP bridge image for the ai-stack.
+#
+# This is NOT the Kali toolbox (that's ../Containerfile -> kali-sandbox:latest).
+# This is a thin Streamable-HTTP MCP server that execs into the already-running,
+# egress-sandboxed `kali-sandbox` container via the host's podman socket.
+#
+# Base is podman's own image so the `podman` CLI is present; with CONTAINER_HOST
+# pointed at the mounted host socket it acts as a remote client of host podman.
+#
+# Build:  podman build -t kali-mcp:latest -f Containerfile .   (context = this dir)
+
+FROM quay.io/podman/stable:latest
+
+RUN dnf -y install python3-pip && dnf clean all && \
+    pip3 install --no-cache-dir "mcp<2" pyyaml
+
+WORKDIR /app
+COPY server.py tools.yaml descriptions.json ./
+
+ENV MCP_TRANSPORT=streamable-http \
+    MCP_PORT=8000 \
+    SANDBOX_NAME=kali-sandbox \
+    EXEC_USER=operator
+
+EXPOSE 8000
+# Override the base image's entrypoint (it expects to run a container engine).
+ENTRYPOINT []
+CMD ["python3", "server.py"]

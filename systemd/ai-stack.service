@@ -1,0 +1,18 @@
+[Unit]
+Description=ai-stack (podman-compose) - Open WebUI, llama-swap, ComfyUI, SearXNG, MCP servers
+Documentation=file:///%h/ai-stack/README.md
+Wants=network-online.target kali-sandbox.service
+After=network-online.target kali-sandbox.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=%h/ai-stack
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+TimeoutStartSec=0
+ExecStart=/usr/bin/podman-compose -f %h/ai-stack/compose.yaml up -d
+ExecStop=/usr/bin/podman-compose -f %h/ai-stack/compose.yaml down
+
+[Install]
+WantedBy=default.target

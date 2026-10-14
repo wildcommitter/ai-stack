@@ -1,0 +1,50 @@
+# Kali Linux red-team sandbox
+# Build:  podman build -t kali-sandbox:latest -f Containerfile .
+#
+# Uses the full "everything" metapackage. This is large (~20GB+ unpacked and a
+# long build). If you want a leaner image, swap kali-linux-everything for
+# kali-linux-headless + kali-tools-top10 (see README).
+
+FROM docker.io/kalilinux/kali-rolling:latest
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# Base utilities first so a failed metapackage install doesn't cost the whole layer.
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+        kali-archive-keyring \
+        ca-certificates \
+        curl wget git \
+        iproute2 iputils-ping net-tools dnsutils \
+        wireguard-tools openvpn openresolv \
+        tini \
+        tealdeer \
+        python3 python3-pip python3-venv \
+        jq && \
+    (tldr --update 2>/dev/null || true) && \
+    rm -rf /var/lib/apt/lists/*
+
+# The full Kali toolset. Split into its own layer so it can be cached/retried.
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends kali-linux-everything && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Non-root operator account. Many tools need raw sockets / CAP_NET_RAW, which we
+# grant at run time via --cap-add rather than running everything as uid 0.
+# The Kali/Debian base ships a system "operator" account (uid 37), so create
+# the user only if missing and (re)configure a real home + login shell either way.
+RUN groupadd -f operator && \
+    if ! id -u operator >/dev/null 2>&1; then useradd -m -s /bin/bash -g operator operator; fi && \
+    usermod -d /home/operator -s /bin/bash operator && \
+    mkdir -p /home/operator /work && \
+    chown -R operator:operator /home/operator /work
+
+WORKDIR /work
+
+# tini reaps zombies from long tool runs; keep the container alive so the MCP
+# server can `podman exec` into it.
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["sleep", "infinity"]

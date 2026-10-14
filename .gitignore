@@ -1,0 +1,18 @@
+# Host-specific / secrets (generated from *.example by scripts/install.sh)
+.env
+config/searxng/settings.yml
+
+# Python venvs and caches
+**/.venv/
+**/__pycache__/
+*.pyc
+
+# Sandbox scratch / runtime outputs
+services/kali-mcp/work/
+
+# Large data that lives outside the repo (safety net if symlinked in)
+**/models/
+**/output/
+*.gguf
+*.safetensors
+*.log

@@ -1,0 +1,147 @@
+# Podman AI stack: Open WebUI + llama-swap (LLM) + ComfyUI + SearXNG + MCP servers
+#
+#   podman-compose -f compose.yaml up -d      (or: systemctl --user start ai-stack)
+#
+#   Open WebUI:  http://localhost:3000   llama-swap: http://localhost:8080/v1
+#   ComfyUI:     http://localhost:8188   SearXNG:    http://localhost:8888
+#   mcp-search:  http://localhost:8765/mcp   playwright: http://localhost:8931/mcp
+#   kali-mcp:    http://localhost:8099/mcp
+#   All host ports are bound to 127.0.0.1 only.
+#
+# Host-specific values (GPU GIDs, model paths, egress) live in .env — copy
+# .env.example to .env and adjust. Large model trees are NOT in this repo; set
+# their host paths in .env.
+
+services:
+  llm:
+    image: localhost/llamacpp-rocm:gfx1201-v263
+    devices: ["/dev/kfd", "/dev/dri"]
+    group_add:
+      - "${RENDER_GID}"     # render GID: getent group render
+      - "${VIDEO_GID}"      # video  GID: getent group video
+    security_opt: ["seccomp=unconfined"]
+    environment:
+      - HIP_VISIBLE_DEVICES=${HIP_VISIBLE_DEVICES}
+    volumes:
+      - ${MODELS_DIR}:/models:ro
+      - ./config/llama-swap.yaml:/config/llama-swap.yaml:ro
+    ports: ["127.0.0.1:8080:8080"]
+    restart: unless-stopped
+
+  comfyui:
+    image: localhost/comfyui-rocm:gfx1201
+    devices: ["/dev/kfd", "/dev/dri"]
+    group_add:
+      - "${RENDER_GID}"
+      - "${VIDEO_GID}"
+    security_opt: ["seccomp=unconfined"]
+    environment:
+      - HIP_VISIBLE_DEVICES=${HIP_VISIBLE_DEVICES}
+    command: >
+      python main.py --listen 0.0.0.0 --port 8188 --cache-none
+    volumes:
+      - ${COMFYUI_MODELS_DIR}:/app/models
+      - ${COMFYUI_OUTPUT_DIR}:/app/output
+    ports: ["127.0.0.1:8188:8188"]
+    restart: unless-stopped
+
+  searxng:
+    image: searxng/searxng:latest
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+    volumes:
+      - ./config/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    ports: ["127.0.0.1:8888:8080"]
+    restart: unless-stopped
+
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - OPENAI_API_BASE_URLS=http://llm:8080/v1
+      - OPENAI_API_KEYS=sk-none
+      - WEBUI_AUTH=False
+      - ENABLE_WEB_SEARCH=True
+      - WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+      - SEARXNG_LANGUAGE=all
+      - WEB_SEARCH_RESULT_COUNT=3
+      - WEB_SEARCH_CONCURRENT_REQUESTS=10
+      - WEB_LOADER_CONCURRENT_REQUESTS=10
+    volumes:
+      - openwebui:/app/backend/data
+    ports: ["127.0.0.1:3000:8080"]
+    depends_on: [searxng]
+    restart: unless-stopped
+
+  # One-shot: installs the ComfyUI tools into Open WebUI (generate_image / describe_image).
+  webui-init:
+    image: python:3.12-slim
+    depends_on: [webui]
+    environment:
+      - OPEN_WEBUI_URL=http://webui:8080
+      - |
+        FUNCTION_SPECS=[
+          {"id": "comfyui_qwen21_t2i", "name": "ComfyUI Qwen-Image-2.1 Text-to-Image", "file": "/functions/comfyui_qwen21_t2i.py"},
+          {"id": "comfyui_qwen21_vlm", "name": "ComfyUI Image Description (VLM)", "file": "/functions/comfyui_qwen21_vlm.py"}
+        ]
+    volumes:
+      - ./services/comfyui/tools:/functions:ro
+      - ./services/comfyui/tools/install_function.py:/install_function.py:ro
+    command: ["python", "/install_function.py"]
+    restart: "no"
+
+  mcp-search:
+    build:
+      context: ./services/mcp-search
+    image: localhost/mcp-search:latest
+    environment:
+      - SEARXNG_URL=http://searxng:8080/search
+    ports: ["127.0.0.1:8765:8000"]
+    depends_on: [searxng]
+    restart: unless-stopped
+
+  playwright-mcp:
+    image: mcr.microsoft.com/playwright/mcp:latest
+    init: true
+    entrypoint: ["node"]
+    command:
+      - /app/cli.js
+      - --headless
+      - --browser
+      - chromium
+      - --no-sandbox
+      - --isolated
+      - --allowed-hosts
+      - "*"
+      - --port
+      - "8931"
+      - --host
+      - 0.0.0.0
+    ports: ["127.0.0.1:8931:8931"]
+    restart: unless-stopped
+
+  # kali-mcp: Streamable-HTTP MCP server exposing the Kali red-team toolset. It
+  # execs into the separately-launched, egress-sandboxed `kali-sandbox` container
+  # (systemd: kali-sandbox.service) via the host's podman socket.
+  kali-mcp:
+    build:
+      context: ./services/kali-mcp/mcp
+    image: localhost/kali-mcp:latest
+    environment:
+      - MCP_TRANSPORT=streamable-http
+      - MCP_PORT=8000
+      - SANDBOX_NAME=kali-sandbox
+      - EXEC_USER=operator
+      - CONTAINER_HOST=unix:///run/podman/podman.sock
+    volumes:
+      - ${XDG_RUNTIME_DIR}/podman/podman.sock:/run/podman/podman.sock
+    ports: ["127.0.0.1:8099:8000"]
+    restart: unless-stopped
+
+volumes:
+  # External so the stack keeps its existing Open WebUI data regardless of the
+  # compose project name. On a brand-new host, create it first:
+  #   podman volume create user_openwebui
+  openwebui:
+    external: true
+    name: user_openwebui

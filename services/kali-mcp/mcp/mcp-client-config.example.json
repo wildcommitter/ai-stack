@@ -1,0 +1,15 @@
+{
+  "comment": "Example MCP client config (Claude Desktop: ~/.config/Claude/claude_desktop_config.json; Claude Code: add via `claude mcp add`). Adjust the absolute path and venv python.",
+  "mcpServers": {
+    "kali-sandbox": {
+      "command": "/home/user/cyberops/mcp/.venv/bin/python",
+      "args": ["/home/user/cyberops/mcp/server.py"],
+      "env": {
+        "SANDBOX_NAME": "kali-sandbox",
+        "EXEC_USER": "operator",
+        "DEFAULT_TIMEOUT": "300",
+        "MAX_OUTPUT": "100000"
+      }
+    }
+  }
+}

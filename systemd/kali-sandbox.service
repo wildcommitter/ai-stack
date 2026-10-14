@@ -1,0 +1,19 @@
+[Unit]
+Description=Kali red-team sandbox container (network egress-pinned)
+Documentation=file:///%h/ai-stack/services/kali-mcp/README.md
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=%h/ai-stack/services/kali-mcp
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=NET_MODE=iface
+EnvironmentFile=-%h/.config/kali-sandbox.env
+ExecStart=%h/ai-stack/services/kali-mcp/scripts/run-sandbox.sh
+ExecStop=/usr/bin/podman stop -t 10 kali-sandbox
+ExecStopPost=/usr/bin/podman rm -f kali-sandbox
+
+[Install]
+WantedBy=default.target

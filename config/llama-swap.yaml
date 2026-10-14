@@ -1,0 +1,71 @@
+healthCheckTimeout: 600      # 32B cold-load from disk can take ~60s
+logLevel: info
+
+models:
+#  "qwen3.8-27b":
+#    cmd: |
+#      /opt/llama.cpp/build/bin/llama-server
+#      --host 0.0.0.0 --port 8079
+#      -m /models/qwen3.8-27b/Qwen3.8-27B-Uncensored-Q6_K.gguf
+#      -ngl 99 --flash-attn auto -c 32768 -ctk q8_0 -ctv q8_0
+#      --jinja --reasoning-preserve -a qwen3.8-27b
+#    proxy: http://127.0.0.1:8079
+#    ttl: 3600
+
+  "qwen3.8-27b-heretic":
+    name: "Qwen3.8-27B RVN Heretic (Q6_K, MTP)"
+    cmd: |
+      /opt/llama.cpp/build/bin/llama-server
+      --host 127.0.0.1 --port 8078
+      -ngl 99
+      -fa on
+      --jinja
+      --reasoning-preserve
+      --metrics
+      -m /models/RVN-Q6_K-multilingual-mtp.gguf
+      -c 131072
+      --cache-type-k q8_0 --cache-type-v q8_0
+      --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.65
+      --parallel 1
+      --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0.0
+      --repeat-penalty 1.0
+    proxy: "http://127.0.0.1:8078"
+    checkEndpoint: "/health"
+    ttl: 600          # 10 min idle -> unload from GPU so ComfyUI (direct web UI) can use VRAM
+    unloadTimeout: 30
+
+  # Code completion (FIM) for llama.vscode in VSCodium. Small enough (~2 GB
+  # VRAM incl. KV) to stay loaded next to the 27B; see routing.groups below.
+  # llama.vscode sends no "model" field, so it calls
+  # http://127.0.0.1:8080/upstream/qwen2.5-coder-1.5b-fim/infill
+  "qwen2.5-coder-1.5b-fim":
+    name: "Qwen2.5-Coder 1.5B (Q8_0, FIM)"
+    cmd: |
+      /opt/llama.cpp/build/bin/llama-server
+      --host 127.0.0.1 --port 8077
+      -ngl 99
+      -fa on
+      -m /models/qwen2.5-coder-1.5b/qwen2.5-coder-1.5b-q8_0.gguf
+      -c 16384
+      -ub 512 -b 512
+      --cache-reuse 256
+      --parallel 1
+    proxy: "http://127.0.0.1:8077"
+    checkEndpoint: "/health"
+    ttl: 1800         # 30 min idle -> unload
+    unloadTimeout: 10
+
+# Let the chat model and the completion model run side by side instead of
+# swapping each other out. /api/models/unload (used by the btc-ad pipeline
+# before ComfyUI jobs) still unloads both.
+routing:
+  router:
+    use: group
+    settings:
+      groups:
+        "coding":
+          swap: false
+          exclusive: true
+          members:
+            - "qwen3.8-27b-heretic"
+            - "qwen2.5-coder-1.5b-fim"

@@ -1,0 +1,866 @@
+{
+  "aircrack-ng": {
+    "description": "Crack WEP and WPA/WPA2 keys from handshake in captured packets. Part of Aircrack-ng network software suite.",
+    "fallback": "WEP/WPA/WPA2 cracking suite.",
+    "source": "tldr",
+    "tldr": "Crack WEP and WPA/WPA2 keys from handshake in captured packets. Part of Aircrack-ng network software suite."
+  },
+  "aireplay-ng": {
+    "description": "Inject packets into a wireless network. Part of Aircrack-ng network software suite.",
+    "fallback": "802.11 packet injection.",
+    "source": "tldr",
+    "tldr": "Inject packets into a wireless network. Part of Aircrack-ng network software suite."
+  },
+  "airmon-ng": {
+    "description": "Activate monitor mode on wireless network devices. Part of Aircrack-ng network software suite.",
+    "fallback": "Enable/disable monitor mode.",
+    "source": "tldr",
+    "tldr": "Activate monitor mode on wireless network devices. Part of Aircrack-ng network software suite."
+  },
+  "airodump-ng": {
+    "description": "Capture packets and display information about wireless networks. Part of Aircrack-ng network software suite.",
+    "fallback": "802.11 packet capture / AP discovery.",
+    "source": "tldr",
+    "tldr": "Capture packets and display information about wireless networks. Part of Aircrack-ng network software suite."
+  },
+  "amass": {
+    "description": "In-depth Attack Surface Mapping and Asset Discovery tool. Some subcommands such as `intel` have their own usage documentation.",
+    "fallback": "In-depth attack-surface / subdomain mapping.",
+    "source": "tldr",
+    "tldr": "In-depth Attack Surface Mapping and Asset Discovery tool. Some subcommands such as `intel` have their own usage documentation."
+  },
+  "arjun": {
+    "description": "Discover HTTP parameters for web applications.",
+    "fallback": "HTTP parameter discovery.",
+    "source": "tldr",
+    "tldr": "Discover HTTP parameters for web applications."
+  },
+  "arp-scan": {
+    "description": "Send ARP packets to hosts (specified as IP addresses or hostnames) to scan the local network.",
+    "fallback": "Discover hosts on the local network via ARP.",
+    "source": "tldr",
+    "tldr": "Send ARP packets to hosts (specified as IP addresses or hostnames) to scan the local network."
+  },
+  "arpspoof": {
+    "description": "Forge ARP replies to intercept packets.",
+    "fallback": "ARP cache poisoning (dsniff).",
+    "source": "tldr",
+    "tldr": "Forge ARP replies to intercept packets."
+  },
+  "assetfinder": {
+    "description": "Find domains and subdomains related to a target.",
+    "fallback": "Find domains and subdomains related to a target.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "beef-xss": {
+    "description": "Browser Exploitation Framework.",
+    "fallback": "Browser Exploitation Framework.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "bettercap": {
+    "description": "Network attack and monitoring (MITM, Wi-Fi, BLE).",
+    "fallback": "Network attack and monitoring (MITM, Wi-Fi, BLE).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "binwalk": {
+    "description": "Firmware Analysis Tool.",
+    "fallback": "Analyze and extract firmware / embedded files.",
+    "source": "tldr",
+    "tldr": "Firmware Analysis Tool."
+  },
+  "bloodhound-python": {
+    "description": "A Python ingestor for BloodHound, used to enumerate Active Directory relationships.",
+    "fallback": "Python AD data collector for BloodHound.",
+    "source": "tldr",
+    "tldr": "A Python ingestor for BloodHound, used to enumerate Active Directory relationships."
+  },
+  "bully": {
+    "description": "Brute-force the WPS pin of a wireless access point. Necessary information must be gathered with `airmon-ng` and `airodump-ng` before using `bully`.",
+    "fallback": "WPS brute force (alternative).",
+    "source": "tldr",
+    "tldr": "Brute-force the WPS pin of a wireless access point. Necessary information must be gathered with `airmon-ng` and `airodump-ng` before using `bully`."
+  },
+  "cadaver": {
+    "description": "WebDAV client for Unix.",
+    "fallback": "Command-line WebDAV client.",
+    "source": "tldr",
+    "tldr": "WebDAV client for Unix."
+  },
+  "certipy": {
+    "description": "AD CS (certificate services) enumeration/abuse.",
+    "fallback": "AD CS (certificate services) enumeration/abuse.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "cewl": {
+    "description": "URL spidering tool for making a cracking wordlist from web content.",
+    "fallback": "Custom wordlist generator from a site.",
+    "source": "tldr",
+    "tldr": "URL spidering tool for making a cracking wordlist from web content."
+  },
+  "chisel": {
+    "description": "Create TCP/UDP tunnels, transported over HTTP, secured via SSH. Includes both client and server in the same `chisel` executable.",
+    "fallback": "TCP/UDP tunnel over HTTP (pivoting).",
+    "source": "tldr",
+    "tldr": "Create TCP/UDP tunnels, transported over HTTP, secured via SSH. Includes both client and server in the same `chisel` executable."
+  },
+  "commix": {
+    "description": "Automated command-injection testing.",
+    "fallback": "Automated command-injection testing.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "crackmapexec": {
+    "description": "AD/network swiss-army knife (legacy name).",
+    "fallback": "AD/network swiss-army knife (legacy name).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "crunch": {
+    "description": "Wordlist generator.",
+    "fallback": "Wordlist generator.",
+    "source": "tldr",
+    "tldr": "Wordlist generator."
+  },
+  "cupp": {
+    "description": "Common user passwords profiler.",
+    "fallback": "Common user passwords profiler.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "curl": {
+    "description": "Transfer data from or to a server. Supports most protocols, including HTTP, HTTPS, FTP, SCP, etc.",
+    "fallback": "HTTP client.",
+    "source": "tldr",
+    "tldr": "Transfer data from or to a server. Supports most protocols, including HTTP, HTTPS, FTP, SCP, etc."
+  },
+  "dalfox": {
+    "description": "A powerful open-source XSS scanner focused on automation.",
+    "fallback": "Fast XSS scanner / parameter analyzer.",
+    "source": "tldr",
+    "tldr": "A powerful open-source XSS scanner focused on automation."
+  },
+  "davtest": {
+    "description": "Test WebDAV servers for upload/exec.",
+    "fallback": "Test WebDAV servers for upload/exec.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "dig": {
+    "description": "DNS lookup utility.",
+    "fallback": "DNS lookups (BIND dig).",
+    "source": "tldr",
+    "tldr": "DNS lookup utility."
+  },
+  "dirb": {
+    "description": "Scan HTTP-based webservers for directories and files.",
+    "fallback": "Web content scanner.",
+    "source": "tldr",
+    "tldr": "Scan HTTP-based webservers for directories and files."
+  },
+  "dirsearch": {
+    "description": "Web path scanner.",
+    "fallback": "Web path brute forcer.",
+    "source": "tldr",
+    "tldr": "Web path scanner."
+  },
+  "dmitry": {
+    "description": "Deepmagic information gathering (whois, subdomains, ports).",
+    "fallback": "Deepmagic information gathering (whois, subdomains, ports).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "dnsenum": {
+    "description": "DNS enumeration and subdomain brute forcing.",
+    "fallback": "DNS enumeration and subdomain brute forcing.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "dnsmap": {
+    "description": "Scan a domain for common subdomains e.g. smtp.domain.org.",
+    "fallback": "DNS subdomain brute forcing.",
+    "source": "tldr",
+    "tldr": "Scan a domain for common subdomains e.g. smtp.domain.org."
+  },
+  "dnsrecon": {
+    "description": "DNS enumeration tool.",
+    "fallback": "DNS enumeration (records, zone transfer, brute).",
+    "source": "tldr",
+    "tldr": "DNS enumeration tool."
+  },
+  "dnstwist": {
+    "description": "Domain permutation engine (typosquatting/phishing detection).",
+    "fallback": "Domain permutation engine (typosquatting/phishing detection).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "dnsx": {
+    "description": "A fast and multi-purpose DNS toolkit to run multiple DNS queries. Note: Input to `dnsx` needs to be passed through `stdin` (pipe `|`) in some cases.",
+    "fallback": "Fast multipurpose DNS toolkit.",
+    "source": "tldr",
+    "tldr": "A fast and multi-purpose DNS toolkit to run multiple DNS queries. Note: Input to `dnsx` needs to be passed through `stdin` (pipe `|`) in some cases."
+  },
+  "enum4linux": {
+    "description": "Enumerate Windows and Samba information from remote systems.",
+    "fallback": "SMB/Samba enumeration.",
+    "source": "tldr",
+    "tldr": "Enumerate Windows and Samba information from remote systems."
+  },
+  "enum4linux-ng": {
+    "description": "Modern SMB/Samba enumeration.",
+    "fallback": "Modern SMB/Samba enumeration.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "ettercap": {
+    "description": "MITM attack suite.",
+    "fallback": "MITM attack suite.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "evil-winrm": {
+    "description": "Windows Remote Management (WinRM) shell for pentesting. Once connected, we get a PowerShell prompt on the target host.",
+    "fallback": "WinRM shell for pentesting.",
+    "source": "tldr",
+    "tldr": "Windows Remote Management (WinRM) shell for pentesting. Once connected, we get a PowerShell prompt on the target host."
+  },
+  "exiftool": {
+    "description": "Read and write meta information in files.",
+    "fallback": "Read/write file and image metadata.",
+    "source": "tldr",
+    "tldr": "Read and write meta information in files."
+  },
+  "fcrackzip": {
+    "description": "Fast password cracker for encrypted ZIP archives.",
+    "fallback": "Brute/dictionary cracker for ZIP archives.",
+    "source": "tldr",
+    "tldr": "Fast password cracker for encrypted ZIP archives."
+  },
+  "feroxbuster": {
+    "description": "Simple, fast, recursive content discovery tool written in Rust. Used to brute-force hidden paths on web servers and more.",
+    "fallback": "Recursive content discovery.",
+    "source": "tldr",
+    "tldr": "Simple, fast, recursive content discovery tool written in Rust. Used to brute-force hidden paths on web servers and more."
+  },
+  "ffuf": {
+    "description": "A fast web fuzzer written in Go. The `FUZZ` keyword is used as a placeholder. `ffuf` will try to hit the URL by replacing the word `FUZZ` with every word in the wordlist.",
+    "fallback": "Fast web fuzzer (content, params, vhosts).",
+    "source": "tldr",
+    "tldr": "A fast web fuzzer written in Go. The `FUZZ` keyword is used as a placeholder. `ffuf` will try to hit the URL by replacing the word `FUZZ` with every word in the wordlist."
+  },
+  "fierce": {
+    "description": "DNS reconnaissance / subdomain discovery.",
+    "fallback": "DNS reconnaissance / subdomain discovery.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "foremost": {
+    "description": "Recover files using their headers, footers, and data structures.",
+    "fallback": "File carving / recovery by header.",
+    "source": "tldr",
+    "tldr": "Recover files using their headers, footers, and data structures."
+  },
+  "fping": {
+    "description": "A more powerful ping which can ping multiple hosts.",
+    "fallback": "Ping many hosts in parallel.",
+    "source": "tldr",
+    "tldr": "A more powerful ping which can ping multiple hosts."
+  },
+  "gau": {
+    "description": "Get All URLs: fetch known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, and Common Crawl for any domains.",
+    "fallback": "Fetch known URLs from multiple archive sources.",
+    "source": "tldr",
+    "tldr": "Get All URLs: fetch known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, and Common Crawl for any domains."
+  },
+  "git": {
+    "description": "Distributed version control system. Some subcommands such as `commit`, `add`, `branch`, `switch`, `push`, etc. have their own usage documentation.",
+    "fallback": "Version control (clone tool repos).",
+    "source": "tldr",
+    "tldr": "Distributed version control system. Some subcommands such as `commit`, `add`, `branch`, `switch`, `push`, etc. have their own usage documentation."
+  },
+  "gobuster": {
+    "description": "Brute-forces hidden paths on web servers and more.",
+    "fallback": "Directory/DNS/vhost brute forcing.",
+    "source": "tldr",
+    "tldr": "Brute-forces hidden paths on web servers and more."
+  },
+  "hakrawler": {
+    "description": "Fast web crawler for endpoint discovery.",
+    "fallback": "Fast web crawler for endpoint discovery.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "hash-identifier": {
+    "description": "Identify hash types (interactive).",
+    "fallback": "Identify hash types (interactive).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "hashcat": {
+    "description": "Fast and advanced password recovery tool.",
+    "fallback": "GPU-accelerated password recovery.",
+    "source": "tldr",
+    "tldr": "Fast and advanced password recovery tool."
+  },
+  "hashid": {
+    "description": "Python3 program that identifies data and password hashes.",
+    "fallback": "Identify hash types.",
+    "source": "tldr",
+    "tldr": "Python3 program that identifies data and password hashes."
+  },
+  "hcxdumptool": {
+    "description": "Capture WPA handshakes/PMKID.",
+    "fallback": "Capture WPA handshakes/PMKID.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "hcxpcapngtool": {
+    "description": "Convert captures for hashcat.",
+    "fallback": "Convert captures for hashcat.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "host": {
+    "description": "Look up Domain Name Server.",
+    "fallback": "DNS lookup utility.",
+    "source": "tldr",
+    "tldr": "Look up Domain Name Server."
+  },
+  "hping3": {
+    "description": "Advanced ping utility which supports protocols such TCP, UDP, and raw IP. Best run with elevated privileges.",
+    "fallback": "Custom TCP/IP packet crafting and probing.",
+    "source": "tldr",
+    "tldr": "Advanced ping utility which supports protocols such TCP, UDP, and raw IP. Best run with elevated privileges."
+  },
+  "httpx": {
+    "description": "A fast and multi-purpose HTTP toolkit written in Go to run multiple probes at once. Note: Not to be confused with the unrelated Python's HTTPX which has the same command name.",
+    "fallback": "Fast HTTP probing / tech detection.",
+    "source": "tldr",
+    "tldr": "A fast and multi-purpose HTTP toolkit written in Go to run multiple probes at once. Note: Not to be confused with the unrelated Python's HTTPX which has the same command name."
+  },
+  "hydra": {
+    "description": "Online password guessing tool. Protocols supported include FTP, HTTP(S), SMTP, SNMP, XMPP, SSH, and more.",
+    "fallback": "Network login brute forcer.",
+    "source": "tldr",
+    "tldr": "Online password guessing tool. Protocols supported include FTP, HTTP(S), SMTP, SNMP, XMPP, SSH, and more."
+  },
+  "ike-scan": {
+    "description": "IKE/IPsec VPN discovery and fingerprinting.",
+    "fallback": "IKE/IPsec VPN discovery and fingerprinting.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "impacket-scripts": {
+    "description": "Impacket example scripts (secretsdump, psexec, ntlmrelayx...).",
+    "fallback": "Impacket example scripts (secretsdump, psexec, ntlmrelayx...).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "ipcalc": {
+    "description": "Calculate IP information (subnet, broadcast, host range) from an IP address and netmask.",
+    "fallback": "IPv4 subnet / netmask calculator.",
+    "source": "tldr",
+    "tldr": "Calculate IP information (subnet, broadcast, host range) from an IP address and netmask."
+  },
+  "john": {
+    "description": "Password cracker.",
+    "fallback": "John the Ripper password cracker.",
+    "source": "tldr",
+    "tldr": "Password cracker."
+  },
+  "joomscan": {
+    "description": "Joomla vulnerability scanner.",
+    "fallback": "Joomla vulnerability scanner.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "jq": {
+    "description": "A JSON processor that uses a domain-specific language (DSL).",
+    "fallback": "JSON processor.",
+    "source": "tldr",
+    "tldr": "A JSON processor that uses a domain-specific language (DSL)."
+  },
+  "jwt_tool": {
+    "description": "Test and manipulate JSON Web Tokens.",
+    "fallback": "Test and manipulate JSON Web Tokens.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "katana": {
+    "description": "A fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling.",
+    "fallback": "Crawling and spidering framework.",
+    "source": "tldr",
+    "tldr": "A fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling."
+  },
+  "kerbrute": {
+    "description": "Kerberos pre-auth username/password brute.",
+    "fallback": "Kerberos pre-auth username/password brute.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "kismet": {
+    "description": "A wireless network and device detector, sniffer, wardriving tool, and WIDS (wireless intrusion detection) framework.",
+    "fallback": "Wireless network detector/sniffer.",
+    "source": "tldr",
+    "tldr": "A wireless network and device detector, sniffer, wardriving tool, and WIDS (wireless intrusion detection) framework."
+  },
+  "lbd": {
+    "description": "Load-balancer detector.",
+    "fallback": "Load-balancer detector.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "ldapdomaindump": {
+    "description": "Dump users, computers, groups, OS, and membership information via LDAP to HTML, JSON, and greppable output.",
+    "fallback": "Dump AD info over LDAP to HTML/JSON.",
+    "source": "tldr",
+    "tldr": "Dump users, computers, groups, OS, and membership information via LDAP to HTML, JSON, and greppable output."
+  },
+  "ldapsearch": {
+    "description": "Query an LDAP directory.",
+    "fallback": "Query LDAP / Active Directory directories.",
+    "source": "tldr",
+    "tldr": "Query an LDAP directory."
+  },
+  "ligolo-ng": {
+    "description": "Reverse tunneling / pivoting.",
+    "fallback": "Reverse tunneling / pivoting.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "lynis": {
+    "description": "System and security auditing tool.",
+    "fallback": "Security auditing / hardening scanner for hosts.",
+    "source": "tldr",
+    "tldr": "System and security auditing tool."
+  },
+  "macchanger": {
+    "description": "Manipulate network interface MAC addresses.",
+    "fallback": "View/change MAC addresses.",
+    "source": "tldr",
+    "tldr": "Manipulate network interface MAC addresses."
+  },
+  "masscan": {
+    "description": "A very fast network scanner. Works best with elevated privileges. For help with Nmap compatibility, run `masscan --nmap`.",
+    "fallback": "Internet-scale asynchronous port scanner.",
+    "source": "tldr",
+    "tldr": "A very fast network scanner. Works best with elevated privileges. For help with Nmap compatibility, run `masscan --nmap`."
+  },
+  "medusa": {
+    "description": "A modular and parallel login brute-forcer for a variety of protocols.",
+    "fallback": "Parallel network login brute forcer.",
+    "source": "tldr",
+    "tldr": "A modular and parallel login brute-forcer for a variety of protocols."
+  },
+  "mitm6": {
+    "description": "IPv6 DNS takeover (pairs with ntlmrelayx).",
+    "fallback": "IPv6 DNS takeover (pairs with ntlmrelayx).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "mitmproxy": {
+    "description": "An interactive man-in-the-middle HTTP proxy.",
+    "fallback": "Interactive HTTPS proxy.",
+    "source": "tldr",
+    "tldr": "An interactive man-in-the-middle HTTP proxy."
+  },
+  "msfconsole": {
+    "description": "Console for the Metasploit Framework. Note: Run `sudo msfdb init` to enable the Metasploit database backend prior to launching `msfconsole`.",
+    "fallback": "Metasploit Framework console.",
+    "source": "tldr",
+    "tldr": "Console for the Metasploit Framework. Note: Run `sudo msfdb init` to enable the Metasploit database backend prior to launching `msfconsole`."
+  },
+  "msfvenom": {
+    "description": "Manually generate payloads for metasploit.",
+    "fallback": "Metasploit payload generator/encoder.",
+    "source": "tldr",
+    "tldr": "Manually generate payloads for metasploit."
+  },
+  "mtr": {
+    "description": "Matt's Traceroute: combined traceroute and ping tool.",
+    "fallback": "Combined traceroute + ping diagnostics.",
+    "source": "tldr",
+    "tldr": "Matt's Traceroute: combined traceroute and ping tool."
+  },
+  "mysql": {
+    "description": "The MySQL tool.",
+    "fallback": "MySQL/MariaDB client.",
+    "source": "tldr",
+    "tldr": "The MySQL tool."
+  },
+  "naabu": {
+    "description": "A fast port scanner written in Go with a focus on reliability and simplicity. Note: Some features are only activated when `naabu` is run with root privileges such as SYN scan.",
+    "fallback": "Fast SYN/CONNECT port scanner.",
+    "source": "tldr",
+    "tldr": "A fast port scanner written in Go with a focus on reliability and simplicity. Note: Some features are only activated when `naabu` is run with root privileges such as SYN scan."
+  },
+  "nbtscan": {
+    "description": "Scan networks for NetBIOS name information.",
+    "fallback": "NetBIOS name scanner.",
+    "source": "tldr",
+    "tldr": "Scan networks for NetBIOS name information."
+  },
+  "ncat": {
+    "description": "Read, write, redirect, and encrypt data across a network. An alternative implementation of a similar utility called `netcat`/`nc`.",
+    "fallback": "Feature-rich netcat (nmap suite).",
+    "source": "tldr",
+    "tldr": "Read, write, redirect, and encrypt data across a network. An alternative implementation of a similar utility called `netcat`/`nc`."
+  },
+  "ncrack": {
+    "description": "High-speed network auth cracking.",
+    "fallback": "High-speed network auth cracking.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "netcat": {
+    "description": "This command is an alias of `nc`.",
+    "fallback": "TCP/UDP read/write (nc).",
+    "source": "tldr",
+    "tldr": "This command is an alias of `nc`."
+  },
+  "netdiscover": {
+    "description": "Network scanner used to find live hosts on a network.",
+    "fallback": "Active/passive ARP host discovery.",
+    "source": "tldr",
+    "tldr": "Network scanner used to find live hosts on a network."
+  },
+  "netexec": {
+    "description": "This command is an alias of `nxc`.",
+    "fallback": "Network execution / AD swiss-army knife (nxc, ex-CrackMapExec).",
+    "source": "tldr",
+    "tldr": "This command is an alias of `nxc`."
+  },
+  "ngrep": {
+    "description": "Filter network traffic packets using `regex`.",
+    "fallback": "grep across network traffic.",
+    "source": "tldr",
+    "tldr": "Filter network traffic packets using `regex`."
+  },
+  "nikto": {
+    "description": "Web server scanner which performs tests against web servers for multiple items.",
+    "fallback": "Web server vulnerability scanner.",
+    "source": "tldr",
+    "tldr": "Web server scanner which performs tests against web servers for multiple items."
+  },
+  "nmap": {
+    "description": "Network exploration tool and security/port scanner. Some features (e.g. SYN scan) activate only when `nmap` is run with root privileges.",
+    "fallback": "Network/port/service/OS discovery and scripting (NSE).",
+    "source": "tldr",
+    "tldr": "Network exploration tool and security/port scanner. Some features (e.g. SYN scan) activate only when `nmap` is run with root privileges."
+  },
+  "nmblookup": {
+    "description": "Discover SMB shares.",
+    "fallback": "NetBIOS name lookups.",
+    "source": "tldr",
+    "tldr": "Discover SMB shares."
+  },
+  "nping": {
+    "description": "Network packet generation tool/ping utility.",
+    "fallback": "Packet generation and response analysis (nmap suite).",
+    "source": "tldr",
+    "tldr": "Network packet generation tool/ping utility."
+  },
+  "nuclei": {
+    "description": "Fast and customizable vulnerability scanner using a simple YAML-based DSL.",
+    "fallback": "Template-based vulnerability scanner.",
+    "source": "tldr",
+    "tldr": "Fast and customizable vulnerability scanner using a simple YAML-based DSL."
+  },
+  "onesixtyone": {
+    "description": "Fast SNMP community-string scanner.",
+    "fallback": "Fast SNMP community-string scanner.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "openssl": {
+    "description": "OpenSSL cryptographic toolkit. Some subcommands such as `req` have their own usage documentation.",
+    "fallback": "TLS/crypto toolkit.",
+    "source": "tldr",
+    "tldr": "OpenSSL cryptographic toolkit. Some subcommands such as `req` have their own usage documentation."
+  },
+  "parsero": {
+    "description": "robots.txt disallowed-entry auditor.",
+    "fallback": "robots.txt disallowed-entry auditor.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "patator": {
+    "description": "A multi-purpose brute-forcer, with a modular design and a flexible usage.",
+    "fallback": "Multi-purpose brute forcer.",
+    "source": "tldr",
+    "tldr": "A multi-purpose brute-forcer, with a modular design and a flexible usage."
+  },
+  "proxychains4": {
+    "description": "Force connections through a proxy chain.",
+    "fallback": "Force connections through a proxy chain.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "psql": {
+    "description": "PostgreSQL client.",
+    "fallback": "PostgreSQL client.",
+    "source": "tldr",
+    "tldr": "PostgreSQL client."
+  },
+  "pypykatz": {
+    "description": "Pure-Python mimikatz (parse LSASS/registry secrets).",
+    "fallback": "Pure-Python mimikatz (parse LSASS/registry secrets).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "reaver": {
+    "description": "WPS PIN brute force.",
+    "fallback": "WPS PIN brute force.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "recon-ng": {
+    "description": "Automated reconnaissance and information gathering tool.",
+    "fallback": "Full-featured web reconnaissance framework.",
+    "source": "tldr",
+    "tldr": "Automated reconnaissance and information gathering tool."
+  },
+  "redis-cli": {
+    "description": "Open a connection to a Redis server.",
+    "fallback": "Redis command-line client.",
+    "source": "tldr",
+    "tldr": "Open a connection to a Redis server."
+  },
+  "responder": {
+    "description": "LLMNR/NBT-NS/MDNS poisoner and rogue auth server.",
+    "fallback": "LLMNR/NBT-NS/MDNS poisoner and rogue auth server.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "rpcclient": {
+    "description": "MS-RPC client tool (part of the samba suite).",
+    "fallback": "Query MS-RPC / Samba endpoints.",
+    "source": "tldr",
+    "tldr": "MS-RPC client tool (part of the samba suite)."
+  },
+  "rpcinfo": {
+    "description": "Make an RPC call to an RPC server and reports what it finds.",
+    "fallback": "Report RPC (portmapper) services.",
+    "source": "tldr",
+    "tldr": "Make an RPC call to an RPC server and reports what it finds."
+  },
+  "rustscan": {
+    "description": "Modern Port Scanner written in Rust. Note: `nmap` must be installed for some of the examples below to work.",
+    "fallback": "Fast port scanner that hands open ports to nmap.",
+    "source": "tldr",
+    "tldr": "Modern Port Scanner written in Rust. Note: `nmap` must be installed for some of the examples below to work."
+  },
+  "searchsploit": {
+    "description": "Search Exploit Database for exploits, shellcodes and/or papers. If known version numbers are used as search terms, exploits for both the exact version and others whose version range covers the one specified are shown.",
+    "fallback": "Offline Exploit-DB search.",
+    "source": "tldr",
+    "tldr": "Search Exploit Database for exploits, shellcodes and/or papers. If known version numbers are used as search terms, exploits for both the exact version and others whose version range covers the one specified are shown."
+  },
+  "setoolkit": {
+    "description": "Social-Engineer Toolkit.",
+    "fallback": "Social-Engineer Toolkit.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "shodan": {
+    "description": "Shodan CLI (needs API key).",
+    "fallback": "Shodan CLI (needs API key).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "showmount": {
+    "description": "Display mount information for an NFS server.",
+    "fallback": "List NFS exports/mounts.",
+    "source": "tldr",
+    "tldr": "Display mount information for an NFS server."
+  },
+  "smbclient": {
+    "description": "FTP-like client to access SMB/CIFS resources on servers.",
+    "fallback": "SMB/CIFS client.",
+    "source": "tldr",
+    "tldr": "FTP-like client to access SMB/CIFS resources on servers."
+  },
+  "smbmap": {
+    "description": "Enumerate samba share drives across an entire domain.",
+    "fallback": "Enumerate SMB shares and permissions.",
+    "source": "tldr",
+    "tldr": "Enumerate samba share drives across an entire domain."
+  },
+  "smtp-user-enum": {
+    "description": "Enumerate SMTP users (VRFY/EXPN/RCPT).",
+    "fallback": "Enumerate SMTP users (VRFY/EXPN/RCPT).",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "snmpget": {
+    "description": "Query using the SNMP protocol.",
+    "fallback": "Fetch a single SNMP OID.",
+    "source": "tldr",
+    "tldr": "Query using the SNMP protocol."
+  },
+  "snmptable": {
+    "description": "Fetch data in tabular format.",
+    "fallback": "Render SNMP tables.",
+    "source": "tldr",
+    "tldr": "Fetch data in tabular format."
+  },
+  "snmpwalk": {
+    "description": "SNMP query tool.",
+    "fallback": "SNMP tree enumeration.",
+    "source": "tldr",
+    "tldr": "SNMP query tool."
+  },
+  "socat": {
+    "description": "Multipurpose relay (SOcket CAT).",
+    "fallback": "Multipurpose relay / socket tool.",
+    "source": "tldr",
+    "tldr": "Multipurpose relay (SOcket CAT)."
+  },
+  "sqlmap": {
+    "description": "Detect and exploit SQL injection flaws.",
+    "fallback": "Automated SQL injection detection and exploitation.",
+    "source": "tldr",
+    "tldr": "Detect and exploit SQL injection flaws."
+  },
+  "ssh-audit": {
+    "description": "SSH server/client configuration auditing.",
+    "fallback": "SSH server/client configuration auditing.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "sshuttle": {
+    "description": "Transparent proxy server that tunnels traffic over an SSH connection. Doesn't require root or any special setup on the remote SSH server, though root access on the local machine is prompted for.",
+    "fallback": "VPN-over-SSH / transparent proxy.",
+    "source": "tldr",
+    "tldr": "Transparent proxy server that tunnels traffic over an SSH connection. Doesn't require root or any special setup on the remote SSH server, though root access on the local machine is prompted for."
+  },
+  "sslscan": {
+    "description": "Check SSL/TLS protocols and ciphers supported by a server.",
+    "fallback": "Query SSL/TLS services and ciphers.",
+    "source": "tldr",
+    "tldr": "Check SSL/TLS protocols and ciphers supported by a server."
+  },
+  "sslyze": {
+    "description": "Fast TLS configuration analyzer.",
+    "fallback": "Fast TLS configuration analyzer.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "steghide": {
+    "description": "Steganography tool for JPEG, BMP, WAV, and AU file formats.",
+    "fallback": "Hide/extract data in images and audio.",
+    "source": "tldr",
+    "tldr": "Steganography tool for JPEG, BMP, WAV, and AU file formats."
+  },
+  "subfinder": {
+    "description": "Discover valid subdomains for websites. Designed as a passive framework to be useful for bug bounties and safe for penetration testing.",
+    "fallback": "Passive subdomain discovery.",
+    "source": "tldr",
+    "tldr": "Discover valid subdomains for websites. Designed as a passive framework to be useful for bug bounties and safe for penetration testing."
+  },
+  "sublist3r": {
+    "description": "Fast subdomains enumeration tool for penetration testers.",
+    "fallback": "Subdomain enumeration via search engines.",
+    "source": "tldr",
+    "tldr": "Fast subdomains enumeration tool for penetration testers."
+  },
+  "swaks": {
+    "description": "Swiss Army Knife SMTP, the all-purpose SMTP transaction tester.",
+    "fallback": "Swiss-army SMTP transaction tester.",
+    "source": "tldr",
+    "tldr": "Swiss Army Knife SMTP, the all-purpose SMTP transaction tester."
+  },
+  "tcpdump": {
+    "description": "Dump traffic on a network.",
+    "fallback": "Command-line packet capture.",
+    "source": "tldr",
+    "tldr": "Dump traffic on a network."
+  },
+  "testssl.sh": {
+    "description": "TLS/SSL configuration and vulnerability checker.",
+    "fallback": "TLS/SSL configuration and vulnerability checker.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "theharvester": {
+    "description": "A tool designed to be used in the early stages of a penetration test.",
+    "fallback": "Emails, hosts, subdomains from public sources.",
+    "source": "tldr",
+    "tldr": "A tool designed to be used in the early stages of a penetration test."
+  },
+  "traceroute": {
+    "description": "Print the route packets trace to network host.",
+    "fallback": "Trace network path to a host.",
+    "source": "tldr",
+    "tldr": "Print the route packets trace to network host."
+  },
+  "tshark": {
+    "description": "Packet analysis tool, CLI version of Wireshark.",
+    "fallback": "CLI Wireshark packet analysis.",
+    "source": "tldr",
+    "tldr": "Packet analysis tool, CLI version of Wireshark."
+  },
+  "wafw00f": {
+    "description": "Identify and fingerprint Web Application Firewall (WAF) products protecting a website.",
+    "fallback": "Identify and fingerprint web application firewalls.",
+    "source": "tldr",
+    "tldr": "Identify and fingerprint Web Application Firewall (WAF) products protecting a website."
+  },
+  "wapiti": {
+    "description": "Web application vulnerability scanner.",
+    "fallback": "Web application vulnerability scanner.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "waybackurls": {
+    "description": "Fetch known URLs from the Wayback Machine.",
+    "fallback": "Fetch known URLs from the Wayback Machine.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "wfuzz": {
+    "description": "A web application bruteforcer.",
+    "fallback": "Web application fuzzer.",
+    "source": "tldr",
+    "tldr": "A web application bruteforcer."
+  },
+  "wget": {
+    "description": "Download files from the Web. Supports HTTP, HTTPS, and FTP.",
+    "fallback": "HTTP/FTP downloader.",
+    "source": "tldr",
+    "tldr": "Download files from the Web. Supports HTTP, HTTPS, and FTP."
+  },
+  "whatweb": {
+    "description": "Next-generation web scanner.",
+    "fallback": "Web technology fingerprinting.",
+    "source": "tldr",
+    "tldr": "Next-generation web scanner."
+  },
+  "whois": {
+    "description": "Client for the WHOIS (RFC 3912) protocol.",
+    "fallback": "WHOIS registration lookups.",
+    "source": "tldr",
+    "tldr": "Client for the WHOIS (RFC 3912) protocol."
+  },
+  "wifite": {
+    "description": "Automated wireless auditing.",
+    "fallback": "Automated wireless auditing.",
+    "source": "catalog",
+    "tldr": ""
+  },
+  "wpscan": {
+    "description": "WordPress vulnerability scanner.",
+    "fallback": "WordPress vulnerability scanner.",
+    "source": "tldr",
+    "tldr": "WordPress vulnerability scanner."
+  },
+  "xsser": {
+    "description": "Cross-site scripting detection framework.",
+    "fallback": "Cross-site scripting detection framework.",
+    "source": "catalog",
+    "tldr": ""
+  }
+}
