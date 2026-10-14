@@ -99,6 +99,19 @@ services:
     command: ["python", "/install_function.py"]
     restart: "no"
 
+  # One-shot: registers all MCP servers in Open WebUI (enabled) and attaches them
+  # to the default model so their tools are available by default in new chats.
+  webui-mcp-init:
+    image: python:3.12-slim
+    depends_on: [webui, mcp-search, playwright-mcp, kali-mcp]
+    environment:
+      - OPEN_WEBUI_URL=http://webui:8080
+      - DEFAULT_MODEL=qwen3.8-27b-heretic   # must match webui DEFAULT_MODELS
+    volumes:
+      - ./services/webui/provision_mcp.py:/provision_mcp.py:ro
+    command: ["python", "/provision_mcp.py"]
+    restart: "no"
+
   mcp-search:
     build:
       context: ./services/mcp-search
