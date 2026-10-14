@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rootless Podman GPU Passthrough for AMD ROCm | ai-stack</title>
+<meta name="description" content="How to pass an AMD Radeon GPU into rootless Podman containers for ROCm: /dev/kfd and /dev/dri devices, render and video group GIDs, HIP_VISIBLE_DEVICES, userns keep-id for volume permissions, and fixing permission-denied errors.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/rootless-podman-gpu-passthrough.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rootless Podman GPU Passthrough for AMD ROCm">
+<meta property="og:description" content="How to pass an AMD Radeon GPU into rootless Podman containers for ROCm: /dev/kfd and /dev/dri devices, render and video group GIDs, HIP_VISIBLE_DEVICES, userns keep-id for volume permissions, and fixing permission-denied errors.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/rootless-podman-gpu-passthrough.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Rootless Podman GPU Passthrough for AMD ROCm", "description": "How to pass an AMD Radeon GPU into rootless Podman containers for ROCm: /dev/kfd and /dev/dri devices, render and video group GIDs, HIP_VISIBLE_DEVICES, userns keep-id for volume permissions, and fixing permission-denied errors.", "url": "https://wildcommitter.github.io/ai-stack/rootless-podman-gpu-passthrough.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/rootless-podman-gpu-passthrough.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which devices does ROCm need in the container?", "acceptedAnswer": {"@type": "Answer", "text": "Two: <code>/dev/kfd</code> (the ROCm compute interface) and <code>/dev/dri</code> (the DRM render nodes). Add both with <code>devices:</code> in compose or <code>--device</code> on the CLI."}}, {"@type": "Question", "name": "I get 'permission denied' on /dev/kfd in a rootless container. Fix?", "acceptedAnswer": {"@type": "Answer", "text": "The container user must be in the host's <code>render</code> and <code>video</code> groups. Add their GIDs with <code>group_add</code> (find them via <code>getent group render</code> and <code>getent group video</code>)."}}, {"@type": "Question", "name": "What is HIP_VISIBLE_DEVICES for?", "acceptedAnswer": {"@type": "Answer", "text": "It selects which GPU ROCm uses. Set <code>HIP_VISIBLE_DEVICES=0</code> to pin to the first/discrete GPU; check <code>rocm-smi</code> if an integrated GPU also appears and shifts indices."}}, {"@type": "Question", "name": "Why do I need seccomp=unconfined?", "acceptedAnswer": {"@type": "Answer", "text": "Some ROCm/HIP ioctls are blocked by the default seccomp profile in rootless mode. <code>security_opt: [seccomp=unconfined]</code> is the simplest fix; a custom profile allowing the needed syscalls also works."}}, {"@type": "Question", "name": "A bind-mounted volume is owned by root and my non-root container user can't write it. Why?", "acceptedAnswer": {"@type": "Answer", "text": "Rootless Podman maps your host user to container root by default, so a non-root in-container user can't write host-mounted paths. Use <code>--userns=keep-id:uid=&lt;uid&gt;,gid=&lt;gid&gt;</code> so your host user maps to that in-container user and owns the mount."}}, {"@type": "Question", "name": "How do I verify the GPU is actually visible inside the container?", "acceptedAnswer": {"@type": "Answer", "text": "Run <code>podman exec &lt;name&gt; rocminfo | grep gfx</code> (should list your arch, e.g. gfx1201) or <code>rocm-smi</code>. If it errors, re-check the devices and group_add."}}, {"@type": "Question", "name": "Do I need root or sudo to run GPU containers?", "acceptedAnswer": {"@type": "Answer", "text": "No \u2014 this is fully rootless. You only need your user in the render/video groups and the device/userns settings above. No daemon, no root."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>Rootless Podman GPU Passthrough for AMD ROCm</h1>
+<p class="lede">Getting ROCm working inside rootless Podman is mostly about two device nodes and the right group membership. Here's the complete checklist.</p>
+<h2>Minimal working service</h2>
+<pre><code>devices: ["/dev/kfd", "/dev/dri"]
+group_add: ["&lt;render-gid&gt;", "&lt;video-gid&gt;"]   # getent group render / video
+security_opt: ["seccomp=unconfined"]
+environment: ["HIP_VISIBLE_DEVICES=0"]</code></pre>
+<p>Verify from inside the container with <code>rocminfo | grep gfx</code> — on RDNA4 you should see <code>gfx1201</code>.</p>
+<h2>Technical FAQ</h2>
+<details><summary>Which devices does ROCm need in the container?</summary><p>Two: <code>/dev/kfd</code> (the ROCm compute interface) and <code>/dev/dri</code> (the DRM render nodes). Add both with <code>devices:</code> in compose or <code>--device</code> on the CLI.</p></details>
+<details><summary>I get &#x27;permission denied&#x27; on /dev/kfd in a rootless container. Fix?</summary><p>The container user must be in the host's <code>render</code> and <code>video</code> groups. Add their GIDs with <code>group_add</code> (find them via <code>getent group render</code> and <code>getent group video</code>).</p></details>
+<details><summary>What is HIP_VISIBLE_DEVICES for?</summary><p>It selects which GPU ROCm uses. Set <code>HIP_VISIBLE_DEVICES=0</code> to pin to the first/discrete GPU; check <code>rocm-smi</code> if an integrated GPU also appears and shifts indices.</p></details>
+<details><summary>Why do I need seccomp=unconfined?</summary><p>Some ROCm/HIP ioctls are blocked by the default seccomp profile in rootless mode. <code>security_opt: [seccomp=unconfined]</code> is the simplest fix; a custom profile allowing the needed syscalls also works.</p></details>
+<details><summary>A bind-mounted volume is owned by root and my non-root container user can&#x27;t write it. Why?</summary><p>Rootless Podman maps your host user to container root by default, so a non-root in-container user can't write host-mounted paths. Use <code>--userns=keep-id:uid=&lt;uid&gt;,gid=&lt;gid&gt;</code> so your host user maps to that in-container user and owns the mount.</p></details>
+<details><summary>How do I verify the GPU is actually visible inside the container?</summary><p>Run <code>podman exec &lt;name&gt; rocminfo | grep gfx</code> (should list your arch, e.g. gfx1201) or <code>rocm-smi</code>. If it errors, re-check the devices and group_add.</p></details>
+<details><summary>Do I need root or sudo to run GPU containers?</summary><p>No — this is fully rootless. You only need your user in the render/video groups and the device/userns settings above. No daemon, no root.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="run-27b-llm-on-amd-32gb.html">Run a 27B LLM on a 32GB AMD GPU →</a>
+<a href="llama-cpp-rocm-gfx1201.html">llama.cpp on AMD ROCm (gfx1201) →</a>
+<a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm →</a>
+<a href="llm-and-image-generation-same-gpu.html">LLM + image gen on one GPU →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>

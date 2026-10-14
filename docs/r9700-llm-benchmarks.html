@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMD Radeon AI PRO R9700 LLM Benchmarks (27B, ROCm) | ai-stack</title>
+<meta name="description" content="Real measured LLM throughput on the AMD Radeon AI PRO R9700 (32GB, RDNA4/gfx1201) with ROCm: ~33 tokens/sec generation and ~110 tokens/sec prompt eval on a 27B Q6_K model via llama.cpp, with the exact config and a reproducible method.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/r9700-llm-benchmarks.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AMD Radeon AI PRO R9700 LLM Benchmarks (27B, ROCm)">
+<meta property="og:description" content="Real measured LLM throughput on the AMD Radeon AI PRO R9700 (32GB, RDNA4/gfx1201) with ROCm: ~33 tokens/sec generation and ~110 tokens/sec prompt eval on a 27B Q6_K model via llama.cpp, with the exact config and a reproducible method.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/r9700-llm-benchmarks.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "AMD Radeon AI PRO R9700 LLM Benchmarks (27B, ROCm)", "description": "Real measured LLM throughput on the AMD Radeon AI PRO R9700 (32GB, RDNA4/gfx1201) with ROCm: ~33 tokens/sec generation and ~110 tokens/sec prompt eval on a 27B Q6_K model via llama.cpp, with the exact config and a reproducible method.", "url": "https://wildcommitter.github.io/ai-stack/r9700-llm-benchmarks.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/r9700-llm-benchmarks.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How many tokens per second does a 27B LLM get on the AMD R9700?", "acceptedAnswer": {"@type": "Answer", "text": "About <strong>33 tokens/sec</strong> for generation and ~110 tokens/sec for prompt eval, measured on a 27B Q6_K model with llama.cpp on ROCm (128K context, q8_0 KV cache, MTP speculative decoding)."}}, {"@type": "Question", "name": "Is the Radeon AI PRO R9700 fast enough for local LLM chat?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. ~33 tokens/sec on a 27B model is well above human reading speed, so chat feels responsive. Smaller models run much faster."}}, {"@type": "Question", "name": "Does speculative decoding (MTP) help on AMD ROCm?", "acceptedAnswer": {"@type": "Answer", "text": "Yes \u2014 in this run the MTP draft head achieved ~85% acceptance (145 of 170 drafted tokens), which raises effective decode throughput at no quality cost."}}, {"@type": "Question", "name": "What changes LLM throughput on the R9700?", "acceptedAnswer": {"@type": "Answer", "text": "Quantization (Q6_K vs Q5/Q4), context length, KV-cache type (q8_0 vs f16), whether speculative decoding is on, and competing GPU load (e.g. an image model) all affect tokens/sec."}}, {"@type": "Question", "name": "How do I benchmark my own AMD GPU?", "acceptedAnswer": {"@type": "Answer", "text": "Send a non-streaming chat completion to your llama.cpp server and read the <code>timings</code> field it returns \u2014 <code>predicted_per_second</code> is decode tok/s, <code>prompt_per_second</code> is prefill. The exact command is above."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>AMD Radeon AI PRO R9700 LLM Benchmarks (27B, ROCm)</h1>
+<p class="lede">Measured on the actual hardware, not estimated. A 27B model at Q6_K generates about 33 tokens/sec on the R9700 — comfortably faster than you can read.</p>
+<h2>Results</h2>
+<p>Single representative run, steady-state (model already loaded), via llama.cpp's own <code>timings</code>:</p>
+<table>
+<tr><th>Metric</th><th>Measured</th></tr>
+<tr><td>Generation (decode)</td><td><strong>33.2 tokens/sec</strong></td></tr>
+<tr><td>Prompt eval (prefill)</td><td><strong>110.0 tokens/sec</strong></td></tr>
+<tr><td>MTP speculative-decode acceptance</td><td><strong>145 / 170 drafts (~85%)</strong></td></tr>
+<tr><td>Output length</td><td>300 tokens</td></tr>
+</table>
+<h2>What was tested</h2>
+<table>
+<tr><td>GPU</td><td>AMD Radeon AI PRO R9700, 32 GB, RDNA4 (<code>gfx1201</code>)</td></tr>
+<tr><td>Runtime</td><td>llama.cpp on ROCm, via llama-swap</td></tr>
+<tr><td>Model</td><td>Qwen3.8-27B (Q6_K, ~21 GB)</td></tr>
+<tr><td>Context / KV cache</td><td>131072 ctx, <code>q8_0</code> K and V</td></tr>
+<tr><td>Features</td><td>Flash attention, embedded-MTP speculative decoding</td></tr>
+</table>
+<p>Key flags: <code>-ngl 99 -fa on -c 131072 --cache-type-k q8_0 --cache-type-v q8_0 --spec-type draft-mtp</code>.</p>
+<div class="note"><strong>Honest caveats:</strong> one run, not an averaged suite; steady-state decode (cold model load from disk is separate and slower); numbers vary with quant, context length, KV-cache type and other GPU load. MTP speculative decoding is on, which lifts decode throughput.</div>
+<h2>Reproduce it</h2>
+<pre><code>curl -s http://localhost:8080/v1/chat/completions -H 'Content-Type: application/json' \
+  -d '{"model":"&lt;your-model&gt;","messages":[{"role":"user","content":"Write ~200 words about ROCm."}],"max_tokens":300,"stream":false}' \
+  | python3 -c 'import sys,json;t=json.load(sys.stdin)["timings"];print(t["predicted_per_second"],"tok/s decode;",t["prompt_per_second"],"tok/s prefill")'</code></pre>
+<h2>Technical FAQ</h2>
+<details><summary>How many tokens per second does a 27B LLM get on the AMD R9700?</summary><p>About <strong>33 tokens/sec</strong> for generation and ~110 tokens/sec for prompt eval, measured on a 27B Q6_K model with llama.cpp on ROCm (128K context, q8_0 KV cache, MTP speculative decoding).</p></details>
+<details><summary>Is the Radeon AI PRO R9700 fast enough for local LLM chat?</summary><p>Yes. ~33 tokens/sec on a 27B model is well above human reading speed, so chat feels responsive. Smaller models run much faster.</p></details>
+<details><summary>Does speculative decoding (MTP) help on AMD ROCm?</summary><p>Yes — in this run the MTP draft head achieved ~85% acceptance (145 of 170 drafted tokens), which raises effective decode throughput at no quality cost.</p></details>
+<details><summary>What changes LLM throughput on the R9700?</summary><p>Quantization (Q6_K vs Q5/Q4), context length, KV-cache type (q8_0 vs f16), whether speculative decoding is on, and competing GPU load (e.g. an image model) all affect tokens/sec.</p></details>
+<details><summary>How do I benchmark my own AMD GPU?</summary><p>Send a non-streaming chat completion to your llama.cpp server and read the <code>timings</code> field it returns — <code>predicted_per_second</code> is decode tok/s, <code>prompt_per_second</code> is prefill. The exact command is above.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="run-27b-llm-on-amd-32gb.html">Run a 27B LLM on a 32GB AMD GPU →</a>
+<a href="llama-cpp-rocm-gfx1201.html">llama.cpp on AMD ROCm (gfx1201) →</a>
+<a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm →</a>
+<a href="llm-and-image-generation-same-gpu.html">LLM + image gen on one GPU →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>

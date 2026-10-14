@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open WebUI with a Local AMD ROCm LLM: Setup &amp; Troubleshooting | ai-stack</title>
+<meta name="description" content="Connect Open WebUI to a local llama.cpp/llama-swap server running on an AMD Radeon GPU (ROCm): OpenAI API base URL, disabling auth, setting a default model, web search and MCP tools. No CUDA.">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/open-webui-amd-setup.html">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Open WebUI with a Local AMD ROCm LLM: Setup &amp; Troubleshooting">
+<meta property="og:description" content="Connect Open WebUI to a local llama.cpp/llama-swap server running on an AMD Radeon GPU (ROCm): OpenAI API base URL, disabling auth, setting a default model, web search and MCP tools. No CUDA.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/open-webui-amd-setup.html">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Open WebUI with a Local AMD ROCm LLM: Setup & Troubleshooting", "description": "Connect Open WebUI to a local llama.cpp/llama-swap server running on an AMD Radeon GPU (ROCm): OpenAI API base URL, disabling auth, setting a default model, web search and MCP tools. No CUDA.", "url": "https://wildcommitter.github.io/ai-stack/open-webui-amd-setup.html", "author": {"@type": "Person", "name": "wildcommitter"}, "publisher": {"@type": "Organization", "name": "ai-stack"}, "mainEntityOfPage": "https://wildcommitter.github.io/ai-stack/open-webui-amd-setup.html"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I connect Open WebUI to a local llama.cpp server?", "acceptedAnswer": {"@type": "Answer", "text": "Set <code>OPENAI_API_BASE_URLS</code> to your llama.cpp/llama-swap endpoint (e.g. <code>http://llm:8080/v1</code>) and put any non-empty string in <code>OPENAI_API_KEYS</code>. Open WebUI treats it as a standard OpenAI-compatible backend."}}, {"@type": "Question", "name": "My model list in Open WebUI is empty \u2014 why?", "acceptedAnswer": {"@type": "Answer", "text": "Open WebUI lists whatever <code>/v1/models</code> returns from your backend. If it's empty, llama-swap isn't reachable at the base URL, or no models are defined in its config. Check <code>curl http://localhost:8080/v1/models</code>."}}, {"@type": "Question", "name": "How do I set a default model for new chats?", "acceptedAnswer": {"@type": "Answer", "text": "Set the <code>DEFAULT_MODELS</code> environment variable to a model id that your backend serves. llama-swap has no default-model concept, so the default lives in Open WebUI."}}, {"@type": "Question", "name": "How do I add web search to Open WebUI without a paid API?", "acceptedAnswer": {"@type": "Answer", "text": "Run a local SearXNG instance and point Open WebUI at it: <code>ENABLE_WEB_SEARCH=True</code>, <code>WEB_SEARCH_ENGINE=searxng</code>, <code>SEARXNG_QUERY_URL=http://searxng:8080/search?q=&lt;query&gt;</code>. No external search API or key needed."}}, {"@type": "Question", "name": "Can Open WebUI call external tools (MCP)?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Open WebUI supports MCP/tool servers: register a Streamable-HTTP MCP endpoint (e.g. <code>http://mcp-search:8000/mcp</code>) as a tool server and the model can call it during chat."}}, {"@type": "Question", "name": "Does Open WebUI run on the GPU?", "acceptedAnswer": {"@type": "Answer", "text": "No \u2014 Open WebUI is just the UI/orchestration layer. The GPU is used by the llama.cpp (LLM) and ComfyUI (image) containers. Open WebUI runs fine on CPU."}}, {"@type": "Question", "name": "How do I keep everything private / loopback-only?", "acceptedAnswer": {"@type": "Answer", "text": "Bind each published port to <code>127.0.0.1</code> in your compose file (e.g. <code>127.0.0.1:3000:8080</code>). Containers talk to each other over the internal network by service name; nothing is exposed to your LAN."}}]}</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a href="index.html">🧩 ai-stack</a>
+  <nav><a href="index.html">Home</a><a href="https://github.com/wildcommitter/ai-stack">GitHub</a></nav>
+</div></header>
+<div class="wrap"><article>
+<h1>Open WebUI with a Local AMD ROCm LLM: Setup & Troubleshooting</h1>
+<p class="lede">Open WebUI is the chat front-end in ai-stack. It talks to a local, OpenAI-compatible llama.cpp server over ROCm — here's how to wire it up and fix the usual snags.</p>
+<h2>The core connection</h2>
+<p>Open WebUI needs one setting to use your local AMD LLM — the OpenAI-compatible base URL of llama-swap:</p>
+<pre><code>OPENAI_API_BASE_URLS=http://llm:8080/v1
+OPENAI_API_KEYS=sk-none        # any non-empty placeholder
+WEBUI_AUTH=False               # single-user homelab
+DEFAULT_MODELS=your-model-id   # pre-select a model for new chats</code></pre>
+<p>That's it — no NVIDIA, no cloud keys. The GPU work happens in the llama.cpp container; Open WebUI just renders chat and orchestrates tools.</p>
+<h2>Technical FAQ</h2>
+<details><summary>How do I connect Open WebUI to a local llama.cpp server?</summary><p>Set <code>OPENAI_API_BASE_URLS</code> to your llama.cpp/llama-swap endpoint (e.g. <code>http://llm:8080/v1</code>) and put any non-empty string in <code>OPENAI_API_KEYS</code>. Open WebUI treats it as a standard OpenAI-compatible backend.</p></details>
+<details><summary>My model list in Open WebUI is empty — why?</summary><p>Open WebUI lists whatever <code>/v1/models</code> returns from your backend. If it's empty, llama-swap isn't reachable at the base URL, or no models are defined in its config. Check <code>curl http://localhost:8080/v1/models</code>.</p></details>
+<details><summary>How do I set a default model for new chats?</summary><p>Set the <code>DEFAULT_MODELS</code> environment variable to a model id that your backend serves. llama-swap has no default-model concept, so the default lives in Open WebUI.</p></details>
+<details><summary>How do I add web search to Open WebUI without a paid API?</summary><p>Run a local SearXNG instance and point Open WebUI at it: <code>ENABLE_WEB_SEARCH=True</code>, <code>WEB_SEARCH_ENGINE=searxng</code>, <code>SEARXNG_QUERY_URL=http://searxng:8080/search?q=&lt;query&gt;</code>. No external search API or key needed.</p></details>
+<details><summary>Can Open WebUI call external tools (MCP)?</summary><p>Yes. Open WebUI supports MCP/tool servers: register a Streamable-HTTP MCP endpoint (e.g. <code>http://mcp-search:8000/mcp</code>) as a tool server and the model can call it during chat.</p></details>
+<details><summary>Does Open WebUI run on the GPU?</summary><p>No — Open WebUI is just the UI/orchestration layer. The GPU is used by the llama.cpp (LLM) and ComfyUI (image) containers. Open WebUI runs fine on CPU.</p></details>
+<details><summary>How do I keep everything private / loopback-only?</summary><p>Bind each published port to <code>127.0.0.1</code> in your compose file (e.g. <code>127.0.0.1:3000:8080</code>). Containers talk to each other over the internal network by service name; nothing is exposed to your LAN.</p></details>
+<p style="margin-top:22px"><a class="cta" href="https://github.com/wildcommitter/ai-stack">Get the full stack on GitHub →</a></p>
+<div class="related"><strong>Related guides</strong>
+<a href="run-27b-llm-on-amd-32gb.html">Run a 27B LLM on a 32GB AMD GPU →</a>
+<a href="llama-cpp-rocm-gfx1201.html">llama.cpp on AMD ROCm (gfx1201) →</a>
+<a href="comfyui-amd-rocm.html">ComfyUI on AMD ROCm →</a>
+<a href="llm-and-image-generation-same-gpu.html">LLM + image gen on one GPU →</a>
+</div>
+</article></div>
+<footer>Part of <a href="index.html">ai-stack</a> — local-first AI on AMD ROCm, no CUDA. <a href="https://github.com/wildcommitter/ai-stack">Source (MIT)</a>.</footer>
+</body></html>
