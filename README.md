@@ -135,12 +135,6 @@ ai-stack/
 └── AGENTS.md             # technical source of truth / contributor guide
 ```
 
-## Contributing
-
-Technical details, conventions, run/restart commands and the gotchas live in
-**[AGENTS.md](AGENTS.md)** — the source of truth for anyone (human or AI) working
-on this repo. Issues and PRs welcome.
-
 ## Security & responsible use
 
 The Kali component is for **learning and authorized testing only** — standard,
