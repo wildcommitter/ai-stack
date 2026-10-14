@@ -49,6 +49,14 @@ podman-compose -f compose.yaml config            # validate compose + .env subst
   `ui.default_models` config row. Don't invent a llama-swap default.
 - **GPU handoff:** the 27B LLM (~28 GB) and ComfyUI can't share the 32 GB card.
   llama-swap unloads on idle TTL; don't add `persist: true` to the 27B.
+- **ROCm kernel cache (cold-load speed):** on the gfx1201 arch, llama.cpp/ROCm
+  JIT-compiles kernels on first inference and caches them in `/root/.cache`
+  (comgr `llvmcache-*`). This is a **one-time ~3–5 min** cost. The `llm` and
+  `comfyui` services mount persistent volumes (`llm_cache`, `comfyui_cache`) at
+  `/root/.cache` so that cost survives container recreation — **do not remove
+  them**, or the first inference after every `compose up`/rebuild/reboot stalls
+  for minutes while it recompiles. With the cache warm, a 27B cold load is ~3 s.
+  A truly fresh cache (new GPU/driver) pays the warmup once, then it's permanent.
 - **kali-mcp is a bridge**, not a toolbox: it execs into the separate
   `kali-sandbox` container via the mounted podman socket. `kali-sandbox` is
   **not** a compose service — it is `kali-sandbox.service`. If tools report

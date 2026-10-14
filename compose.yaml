@@ -25,6 +25,10 @@ services:
     volumes:
       - ${MODELS_DIR}:/models:ro
       - ./config/llama-swap.yaml:/config/llama-swap.yaml:ro
+      # Persist the ROCm kernel-compile cache (comgr/hipBLASLt) so the one-time
+      # gfx1201 JIT warmup (~minutes) survives container recreation. Without this,
+      # the first inference after every `compose up`/reboot recompiles kernels.
+      - llm_cache:/root/.cache
     ports: ["127.0.0.1:8080:8080"]
     restart: unless-stopped
 
@@ -42,6 +46,8 @@ services:
     volumes:
       - ${COMFYUI_MODELS_DIR}:/app/models
       - ${COMFYUI_OUTPUT_DIR}:/app/output
+      # Same rationale: persist MIOpen/comgr kernel cache across recreation.
+      - comfyui_cache:/root/.cache
     ports: ["127.0.0.1:8188:8188"]
     restart: unless-stopped
 
@@ -148,3 +154,5 @@ volumes:
   openwebui:
     external: true
     name: user_openwebui
+  llm_cache:
+  comfyui_cache:
