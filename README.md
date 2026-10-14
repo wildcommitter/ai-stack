@@ -1,64 +1,65 @@
 <div align="center">
 
-# 🧩 ai-stack
+# 🧩 ai-stack — a complete local AI stack on AMD (no NVIDIA, no CUDA, no cloud)
 
-### A complete, self-hosted AI stack for the **AMD Radeon AI PRO R9700** — chat, web search, image generation, browser automation, and a sandboxed security lab, all local and GPU-accelerated.
+### Run your own LLM chat, web search, image generation, browser automation, and a sandboxed security lab — 100% self-hosted on an **AMD Radeon** GPU with **ROCm**.
 
 ![Podman](https://img.shields.io/badge/Podman-rootless-892CA0)
 ![ROCm](https://img.shields.io/badge/ROCm-gfx1201%20(RDNA4)-ED1C24)
 ![AMD R9700](https://img.shields.io/badge/GPU-Radeon%20AI%20PRO%20R9700%2032GB-000000)
+![No CUDA](https://img.shields.io/badge/CUDA-not%20required-76B900)
 ![Open WebUI](https://img.shields.io/badge/Open%20WebUI-chat%20%2B%20tools-0A0A0A)
 ![MCP](https://img.shields.io/badge/MCP-3%20tool%20servers-2EA043)
-![systemd](https://img.shields.io/badge/systemd-supervised-30A3DC)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 </div>
 
----
-
-**ai-stack** turns a single AMD GPU workstation into a private, offline-capable AI
-platform. One chat window drives a local LLM that can search the web, generate and
-describe images, pilot a headless browser, and run a network-sandboxed Linux
-security lab — orchestrated with rootless **Podman**, wired together over the
-**Model Context Protocol (MCP)**, and brought up on boot by **systemd**. No cloud,
-no API keys leaving the box, every port bound to `127.0.0.1`.
-
-It's built and tuned for one specific, increasingly popular card — so if you have
-the same hardware, you get the whole experience with a clone and one script.
+> **Run LLMs locally on AMD.** A private, offline-capable AI platform — a self-hosted
+> ChatGPT-style assistant, local Stable-Diffusion-style image generation, and
+> AI tool-use — built entirely on **AMD ROCm**. No NVIDIA card, no CUDA, no API
+> keys, no subscription. One GPU, one `git clone`, one script.
 
 <div align="center">
-<img src="docs/demo.gif" alt="ai-stack demo: services up, local models served, sandboxed security lab" width="900">
+<img src="docs/demo.gif" alt="Local AI on AMD ROCm: Open WebUI, llama.cpp, ComfyUI and MCP tools running self-hosted on a Radeon GPU" width="900">
 </div>
 
-## 🎯 Built for the AMD Radeon AI PRO R9700
+## Why AMD? (the short version)
 
-AMD's RDNA4 workstation card (**32 GB**, `gfx1201`) is a compelling local-AI GPU,
-but the software path is less trodden than CUDA's. This repo is the opinionated,
-working answer: every component runs on **ROCm** against `gfx1201`, and the one
-genuinely hard problem on a 32 GB card — **fitting a 27B chat model *and* a
-diffusion pipeline on the same VRAM** — is solved here, not hand-waved.
+Running large models usually means paying the NVIDIA premium. You don't have to.
+Modern **AMD Radeon** cards ship with a lot of VRAM per dollar, and the open
+**ROCm** stack now runs llama.cpp, ComfyUI and the whole local-AI toolchain well —
+*if* someone has already worked out the images, flags and VRAM juggling. This repo
+is that work, done and reproducible:
 
-> New to ROCm on RDNA4? That's the point. Clone it, point it at your models, and
-> skip the weeks of figuring out which flags, images and VRAM dances actually work.
+- ✅ **No CUDA, no vendor lock-in** — every service runs on ROCm.
+- ✅ **More VRAM for your money** — a 32 GB card runs a 27B chat model *and* image
+  generation (see [VRAM handoff](#the-interesting-part-vram-handoff)).
+- ✅ **Private & offline** — nothing leaves your machine; all ports bind to `127.0.0.1`.
+- ✅ **Turnkey** — clone, run `install.sh`, pull models, `systemctl start`.
 
-## ✨ Highlights
+## What you get
 
-- **One chat, many tools.** Open WebUI + a 27B LLM that calls MCP tools for web
-  search, image gen/VLM, browsing, and a Kali security lab.
-- **Smart VRAM sharing.** `llama-swap` loads/unloads GGUF models on demand and
-  frees the GPU so ComfyUI can run — the 27B (~28 GB) and image models never
-  fight over the 32 GB card.
-- **Rootless & private.** Everything runs as a normal user under Podman; all
-  services listen on loopback only.
-- **Reproducible.** Portable `compose.yaml` + `.env`, one-shot `install.sh`,
-  systemd units for supervised boot, and a checksum-verifying model downloader.
-- **Composable by design.** Tools are MCP servers, so the same capabilities plug
-  into any MCP-aware client, not just Open WebUI.
+| Capability | How |
+|---|---|
+| 💬 **Local LLM chat** (private ChatGPT alternative) | Open WebUI + llama.cpp/llama-swap, OpenAI-compatible API |
+| 🔎 **Web search in chat** | SearXNG + an MCP search tool |
+| 🎨 **Image generation & vision** | ComfyUI (Qwen-Image) on ROCm, called from chat |
+| 🌐 **Browser automation** | Playwright MCP (headless Chromium) |
+| 🛡️ **Sandboxed security lab** | Kali toolbox over MCP, network-egress-pinned |
+| ♻️ **Supervised & reproducible** | rootless Podman + systemd, portable `compose.yaml` |
 
-## 🗺️ Architecture
+## Hardware
+
+Built and tuned on the **AMD Radeon AI PRO R9700** (32 GB, RDNA4, `gfx1201`) with
+**ROCm**. It should port to other ROCm-supported Radeon cards by adjusting the
+image targets and `.env` — the architecture is GPU-agnostic; only the two local
+image tags (`llamacpp-rocm`, `comfyui-rocm`) are built for `gfx1201`.
+
+## Architecture
 
 ```
                  ┌───────────────── Open WebUI (chat UI) ─────────────────┐
-  you  ──────►   │  default model: Qwen3.8-27B (local)                     │
+  you  ──────►   │  default model: Qwen3.8-27B (local, ROCm)              │
                  └───┬───────────────┬───────────────┬───────────────┬────┘
                      │ /v1 (chat)    │ MCP           │ MCP           │ MCP
                      ▼               ▼               ▼               ▼
@@ -69,110 +70,90 @@ diffusion pipeline on the same VRAM** — is solved here, not hand-waved.
                                                             (egress-pinned lab)
 
   comfyui (image gen, ROCm) is invoked by Open WebUI tools; llama-swap frees
-  VRAM first so the diffusion pipeline fits. All ports bind to 127.0.0.1.
+  VRAM first so the diffusion pipeline fits. Everything binds to 127.0.0.1.
 ```
 
-## 🧱 Services
+## Quick start
 
-| Service | Image | Port | Role |
-|---|---|---|---|
-| `llm` | `llamacpp-rocm` (local) | 8080 | llama-swap: on-demand GGUF load/unload, OpenAI API at `/v1` |
-| `comfyui` | `comfyui-rocm` (local) | 8188 | Qwen-Image-2.1 text-to-image / VLM |
-| `searxng` | `searxng/searxng` | 8888 | private metasearch behind web search |
-| `webui` | `open-webui` | 3000 | chat UI + tool orchestration |
-| `mcp-search` | local build | 8765 | MCP: `web_search` via SearXNG |
-| `playwright-mcp` | `playwright/mcp` | 8931 | MCP: headless-browser automation |
-| `kali-mcp` | local build | 8099 | MCP: security-lab tools + shell + file ops |
-| `kali-sandbox` | `kali-sandbox` (local) | — | the Kali lab itself; network-egress-pinned |
-
-The `kali-mcp` server holds no tools itself — it execs into the separate,
-egress-pinned `kali-sandbox` container over the host's Podman socket, so the
-lab's traffic stays confined to one interface/VPN. See
-[`services/kali-mcp/README.md`](services/kali-mcp/README.md).
-
-## 🚀 Quick start
-
-**Prerequisites:** an AMD ROCm GPU (built for the R9700 / `gfx1201`), rootless
-Podman + `podman-compose`, and the local images built
-(`llamacpp-rocm`, `comfyui-rocm`, and the Kali sandbox via
-`services/kali-mcp/scripts/build.sh`).
+**Prerequisites:** an AMD ROCm GPU (tuned for the R9700 / `gfx1201`), rootless
+Podman + `podman-compose`, and the local images built (`llamacpp-rocm`,
+`comfyui-rocm`, and the Kali sandbox via `services/kali-mcp/scripts/build.sh`).
 
 ```bash
 git clone https://github.com/wildcommitter/ai-stack.git && cd ai-stack
 ./scripts/install.sh                 # writes .env + secrets, installs systemd units, makes the volume
-$EDITOR .env                         # GPU GIDs, model paths (see getent group render/video)
-./download-model.sh list             # browse the model catalog
+$EDITOR .env                         # GPU GIDs, model paths
 ./download-model.sh all <HF_TOKEN>   # fetch models (sha256-verified) into your model dirs
 systemctl --user start ai-stack.service
 ```
 
-Open **http://localhost:3000** and start chatting. `ai-stack.service` brings the
-sandbox up first, then the compose stack; linger keeps it all running across
-reboots.
+Open **http://localhost:3000** and chat. `download-model.sh list` shows the model
+catalog; downloads are resumable and checksum-verified.
 
-### Models
+## The interesting part: VRAM handoff
 
-`download-model.sh` knows each model's Hugging Face source and destination:
+A 32 GB card holds a 27B LLM (~28 GB with KV cache) *or* an image pipeline — not
+both. ai-stack treats VRAM as shared: `llama-swap` loads the chat model on demand
+and unloads it after an idle timeout, and the image tool unloads the LLM before a
+ComfyUI job and frees it afterward. One GPU, many workloads, no out-of-memory, no
+manual juggling. Details in [`config/llama-swap.yaml`](config/llama-swap.yaml).
 
-```bash
-./download-model.sh list                   # ids, numbers, on-disk status
-./download-model.sh 1 <HF_TOKEN>            # by number
-./download-model.sh comfyui <HF_TOKEN>      # a group (llm | comfyui | all)
-```
+## FAQ
 
-Downloads are resumable and **sha256-verified** against Hugging Face's published
-checksums; a correct file is skipped, a mismatched one is re-fetched cleanly.
+**Can I run a local LLM on an AMD GPU without NVIDIA/CUDA?**
+Yes — that's the whole point. Every component here runs on AMD ROCm.
 
-## 🧠 The interesting engineering: VRAM handoff
+**Is this a self-hosted, private ChatGPT alternative?**
+Yes. Open WebUI gives you a familiar chat interface over a local model; nothing
+leaves your machine and there are no API keys or usage fees.
 
-A 32 GB card can hold a 27B LLM (~28 GB with KV cache) *or* an image pipeline —
-not both. ai-stack treats VRAM as a shared resource:
+**Does it do local image generation (like Stable Diffusion) too?**
+Yes, via ComfyUI on ROCm, callable directly from the chat.
 
-- `llama-swap` loads the chat model on first request and **unloads it after an
-  idle TTL**, so the GPU frees up when you stop chatting.
-- The Open WebUI image tool **unloads the LLM before** submitting a ComfyUI job,
-  then frees ComfyUI's VRAM afterward so chat can resume.
-- A small coder model (1.5B, for IDE autocomplete) is light enough to coexist.
+**What AMD GPU do I need?**
+Developed on the Radeon AI PRO R9700 (32 GB, RDNA4). Other ROCm cards should work
+with image-target and `.env` tweaks; more VRAM lets you run larger models.
 
-The result: one GPU, many workloads, no OOM, no manual juggling. The details live
-in [`config/llama-swap.yaml`](config/llama-swap.yaml).
+**How do I keep the LLM and image model from running out of VRAM?**
+They don't coexist — llama-swap and the image tool hand VRAM back and forth
+automatically. See [VRAM handoff](#the-interesting-part-vram-handoff).
 
-## 📂 Layout
+**Can an AI agent use tools here?**
+Yes — web search, a headless browser, and a sandboxed shell are exposed as MCP
+servers, usable from Open WebUI or any MCP-aware client.
+
+## Repository layout
 
 ```
 ai-stack/
 ├── compose.yaml          # the whole stack (portable paths via .env)
-├── .env.example          # host values: GPU GIDs, model paths, socket
-├── download-model.sh     # checksum-verified HF model fetcher
-├── config/               # llama-swap.yaml, searxng settings (example)
-├── services/
-│   ├── llm/              # llamacpp-rocm image (ROCm/gfx1201)
-│   ├── comfyui/          # ComfyUI image + model downloader + WebUI tools
-│   ├── mcp-search/       # SearXNG-backed MCP server
-│   └── kali-mcp/         # security lab image + MCP bridge (own README)
-├── systemd/              # ai-stack.service, kali-sandbox.service
+├── download-model.sh     # checksum-verified Hugging Face model fetcher
+├── config/               # llama-swap + searxng config
+├── services/             # llm, comfyui, mcp-search, kali-mcp (each buildable)
+├── systemd/              # supervised boot units
 ├── scripts/install.sh    # one-shot host setup
-└── AGENTS.md             # guide for contributors / AI agents
+└── AGENTS.md             # technical source of truth / contributor guide
 ```
 
-## 🔐 Security & responsible use
+## Contributing
 
-The `kali-mcp` / `kali-sandbox` component is a **learning and authorized-testing**
-environment. It runs standard, openly-available security tooling inside a
-network-isolated container whose egress you pin to an interface or VPN. Use it
-**only** against systems you own or have explicit written permission to test.
-It's here to demonstrate sandboxing, MCP tool design and AI-driven automation —
-not to attack anyone.
+Technical details, conventions, run/restart commands and the gotchas live in
+**[AGENTS.md](AGENTS.md)** — the source of truth for anyone (human or AI) working
+on this repo. Issues and PRs welcome.
 
-Secrets (`.env`, SearXNG `secret_key`) are generated locally from `*.example`
-files and are never committed; model weights live outside the repo.
+## Security & responsible use
 
-## 📜 License
+The Kali component is for **learning and authorized testing only** — standard,
+openly-available tooling inside a network-isolated container. Use it only on
+systems you own or have explicit permission to test. Secrets are generated
+locally and never committed; model weights live outside the repo.
 
-See [`LICENSE`](LICENSE).
+## License
+
+[MIT](LICENSE).
 
 ---
 
 <div align="center">
-<sub>Local-first AI on AMD. Built with Podman, ROCm and a lot of VRAM accounting.</sub>
+<sub>Local-first AI on AMD ROCm — self-hosted LLM chat, image generation and agent tools, no CUDA required.</sub>
 </div>
