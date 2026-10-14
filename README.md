@@ -25,6 +25,10 @@ no API keys leaving the box, every port bound to `127.0.0.1`.
 It's built and tuned for one specific, increasingly popular card — so if you have
 the same hardware, you get the whole experience with a clone and one script.
 
+<div align="center">
+<img src="docs/demo.gif" alt="ai-stack demo: services up, local models served, sandboxed security lab" width="900">
+</div>
+
 ## 🎯 Built for the AMD Radeon AI PRO R9700
 
 AMD's RDNA4 workstation card (**32 GB**, `gfx1201`) is a compelling local-AI GPU,
