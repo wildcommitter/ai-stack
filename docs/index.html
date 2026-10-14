@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local AI Stack on AMD ROCm — Run LLMs Without NVIDIA or CUDA | ai-stack</title>
+<meta name="description" content="A complete self-hosted AI stack that runs LLM chat, image generation, web search and agent tools entirely on an AMD Radeon GPU with ROCm. No NVIDIA, no CUDA, no cloud. Open WebUI + llama.cpp + ComfyUI + MCP.">
+<meta name="keywords" content="run LLM on AMD, AMD ROCm local AI, local LLM AMD GPU, CUDA alternative, no NVIDIA AI, self-hosted AI, private ChatGPT alternative, local Stable Diffusion AMD, ComfyUI ROCm, llama.cpp ROCm, Radeon AI PRO R9700, RDNA4, gfx1201, Open WebUI AMD, self hosted AI stack">
+<link rel="canonical" href="https://wildcommitter.github.io/ai-stack/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Local AI Stack on AMD ROCm — Run LLMs Without NVIDIA or CUDA">
+<meta property="og:description" content="Self-hosted LLM chat, image generation, web search and agent tools on one AMD Radeon GPU. No NVIDIA, no CUDA, no cloud.">
+<meta property="og:url" content="https://wildcommitter.github.io/ai-stack/">
+<meta property="og:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Local AI Stack on AMD ROCm — no NVIDIA, no CUDA">
+<meta name="twitter:description" content="Run LLMs and image generation locally on an AMD Radeon GPU. Self-hosted, private, CUDA-free.">
+<meta name="twitter:image" content="https://wildcommitter.github.io/ai-stack/demo.gif">
+<meta name="robots" content="index,follow">
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--fg:#e6edf3;--muted:#9da7b3;--accent:#ED1C24;--accent2:#2ea043;--border:#272e38}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:#58a6ff;text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  header{text-align:center;padding:64px 20px 32px}
+  h1{font-size:2.3rem;line-height:1.2;margin:0 0 12px}
+  .tag{color:var(--muted);font-size:1.15rem;max-width:760px;margin:0 auto 24px}
+  .cta{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .btn{display:inline-block;padding:11px 20px;border-radius:8px;font-weight:600;border:1px solid var(--border)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.ghost{background:var(--panel);color:var(--fg)}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow:auto}
+  section{padding:28px 0;border-top:1px solid var(--border)}
+  h2{font-size:1.5rem;margin:0 0 14px}
+  .demo{display:block;max-width:100%;border:1px solid var(--border);border-radius:10px;margin:8px auto 0}
+  ul.feat{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  ul.feat li{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px}
+  .badges img{height:22px;margin:3px}
+  details{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:600}
+  footer{color:var(--muted);text-align:center;padding:40px 20px;font-size:.9rem}
+  .pill{color:var(--accent2);font-weight:700}
+</style>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"SoftwareApplication",
+  "name":"ai-stack",
+  "applicationCategory":"DeveloperApplication",
+  "operatingSystem":"Linux",
+  "description":"A complete self-hosted AI stack running LLM chat, image generation, web search and agent tools on an AMD Radeon GPU with ROCm. No NVIDIA or CUDA required.",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "url":"https://github.com/wildcommitter/ai-stack",
+  "license":"https://opensource.org/licenses/MIT"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"Can I run a local LLM on an AMD GPU without NVIDIA or CUDA?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every component in ai-stack runs on AMD ROCm — llama.cpp for the LLM and ComfyUI for image generation — so no NVIDIA card or CUDA is needed."}},
+    {"@type":"Question","name":"Is this a self-hosted, private ChatGPT alternative?","acceptedAnswer":{"@type":"Answer","text":"Yes. Open WebUI provides a familiar chat interface over a local model. Nothing leaves your machine and there are no API keys or usage fees."}},
+    {"@type":"Question","name":"Does it do local image generation like Stable Diffusion?","acceptedAnswer":{"@type":"Answer","text":"Yes, via ComfyUI running on ROCm, callable directly from the chat interface."}},
+    {"@type":"Question","name":"Which AMD GPU do I need?","acceptedAnswer":{"@type":"Answer","text":"It is developed on the AMD Radeon AI PRO R9700 (32 GB, RDNA4, gfx1201). Other ROCm-supported Radeon cards work with minor image-target and configuration tweaks; more VRAM lets you run larger models."}},
+    {"@type":"Question","name":"How do the LLM and image model share limited VRAM?","acceptedAnswer":{"@type":"Answer","text":"They do not run at the same time. llama-swap loads the chat model on demand and unloads it on idle, and the image tool frees the LLM's VRAM before running a ComfyUI job, so a single 32 GB card handles both."}}
+  ]
+}
+</script>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Run a full AI stack locally on AMD — <span class="pill">no NVIDIA, no CUDA</span></h1>
+    <p class="tag">Self-hosted LLM chat, image generation, web search and agent tools on a single <strong>AMD Radeon</strong> GPU with <strong>ROCm</strong>. Private, offline-capable, and free of the NVIDIA tax.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/wildcommitter/ai-stack">View on GitHub →</a>
+      <a class="btn ghost" href="https://github.com/wildcommitter/ai-stack#quick-start">Quick start</a>
+    </div>
+    <p class="badges" style="margin-top:22px">
+      <img src="https://img.shields.io/badge/ROCm-gfx1201%20(RDNA4)-ED1C24" alt="ROCm gfx1201 RDNA4">
+      <img src="https://img.shields.io/badge/CUDA-not%20required-76B900" alt="No CUDA required">
+      <img src="https://img.shields.io/badge/Podman-rootless-892CA0" alt="rootless Podman">
+      <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+  <img class="demo" src="demo.gif" alt="Local AI on AMD ROCm: Open WebUI, llama.cpp, ComfyUI and MCP tools running self-hosted on a Radeon GPU" width="900">
+
+  <section>
+    <h2>Why run AI on AMD?</h2>
+    <p>Large models usually mean paying the NVIDIA premium — but you don't have to.
+    Modern <strong>AMD Radeon</strong> cards offer a lot of VRAM per dollar, and the open
+    <strong>ROCm</strong> stack now runs the full local-AI toolchain well. ai-stack packages
+    the images, flags and VRAM management so it works out of the box.</p>
+    <ul class="feat">
+      <li>✅ <strong>No CUDA, no lock-in</strong> — everything runs on ROCm.</li>
+      <li>✅ <strong>More VRAM per dollar</strong> — a 32 GB card runs a 27B chat model <em>and</em> image generation.</li>
+      <li>✅ <strong>Private &amp; offline</strong> — nothing leaves your machine.</li>
+      <li>✅ <strong>Turnkey</strong> — clone, install, pull models, start.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What you get</h2>
+    <ul class="feat">
+      <li>💬 <strong>Local LLM chat</strong> — a private ChatGPT alternative via Open WebUI + llama.cpp.</li>
+      <li>🎨 <strong>Image generation &amp; vision</strong> — ComfyUI on ROCm, from chat.</li>
+      <li>🔎 <strong>Web search in chat</strong> — SearXNG via an MCP tool.</li>
+      <li>🌐 <strong>Browser automation</strong> — headless Playwright over MCP.</li>
+      <li>🛡️ <strong>Sandboxed security lab</strong> — network-egress-pinned toolbox over MCP.</li>
+      <li>♻️ <strong>Reproducible</strong> — rootless Podman + systemd, one portable compose file.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Quick start</h2>
+    <pre><code>git clone https://github.com/wildcommitter/ai-stack.git &amp;&amp; cd ai-stack
+./scripts/install.sh
+./download-model.sh all &lt;HF_TOKEN&gt;
+systemctl --user start ai-stack.service
+# open http://localhost:3000</code></pre>
+  </section>
+
+  <section>
+    <h2>FAQ</h2>
+    <details open><summary>Can I run a local LLM on an AMD GPU without NVIDIA or CUDA?</summary>
+      <p>Yes. Every component runs on AMD ROCm — llama.cpp for the LLM, ComfyUI for images — no NVIDIA card or CUDA needed.</p></details>
+    <details><summary>Is this a self-hosted, private ChatGPT alternative?</summary>
+      <p>Yes. Open WebUI gives a familiar chat UI over a local model; nothing leaves your machine and there are no API keys or fees.</p></details>
+    <details><summary>Does it do local image generation like Stable Diffusion?</summary>
+      <p>Yes, via ComfyUI on ROCm, callable directly from the chat.</p></details>
+    <details><summary>Which AMD GPU do I need?</summary>
+      <p>Developed on the AMD Radeon AI PRO R9700 (32 GB, RDNA4, gfx1201). Other ROCm Radeon cards work with minor tweaks; more VRAM runs larger models.</p></details>
+    <details><summary>How do the LLM and image model share limited VRAM?</summary>
+      <p>They don't run at once — llama-swap unloads the chat model on idle and the image tool frees it before a ComfyUI job, so one 32 GB card handles both.</p></details>
+  </section>
+</div>
+
+<footer>
+  Open source (MIT) · <a href="https://github.com/wildcommitter/ai-stack">github.com/wildcommitter/ai-stack</a><br>
+  Local-first AI on AMD ROCm — self-hosted LLM chat, image generation and agent tools, no CUDA required.
+</footer>
+</body>
+</html>
