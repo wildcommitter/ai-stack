@@ -27,6 +27,26 @@ headless browser, and run a sandboxed **Kali** red-team toolbox — all behind
 egress stays pinned to one interface/VPN. See
 [`services/kali-mcp/README.md`](services/kali-mcp/README.md).
 
+## How it fits together
+
+```
+                 ┌───────────────── Open WebUI (chat UI) ─────────────────┐
+  you  ──────►   │  default model: qwen3.8-27b-heretic                     │
+                 └───┬───────────────┬───────────────┬───────────────┬────┘
+                     │ /v1 (chat)    │ MCP           │ MCP           │ MCP
+                     ▼               ▼               ▼               ▼
+                  llm            mcp-search     playwright-mcp     kali-mcp
+               (llama-swap)         │                               │ podman.sock
+               loads GGUF           ▼                               ▼  (exec)
+               on demand          searxng                      kali-sandbox
+                                                            (egress-pinned Kali)
+  comfyui (image gen) is called by Open WebUI tools; llama-swap frees VRAM first.
+```
+
+All host ports bind to `127.0.0.1`. `ai-stack.service` (systemd, user) runs the
+compose stack after `kali-sandbox.service`; see [`AGENTS.md`](AGENTS.md) for how
+to work in this repo.
+
 ## Layout
 
 ```
