@@ -42,6 +42,25 @@ RUN groupadd -f operator && \
     mkdir -p /home/operator /work && \
     chown -R operator:operator /home/operator /work
 
+# Passwordless sudo for operator. Many Kali tools insist on uid 0 (e.g. raw
+# socket scans without the right caps, service installs, /etc edits). This is a
+# throwaway, network-sandboxed toolbox under ROOTLESS podman, so "root" here is
+# just the host's unprivileged user (keep-id maps operator->uid 1000 on host);
+# NOPASSWD escalation widens nothing on the host, it only spares a password
+# prompt the non-interactive MCP exec can't answer.
+#
+# `sudo` is almost always already pulled in by kali-linux-everything, but
+# install it here (cheap no-op if present) so this works with the leaner
+# headless/top10 image swap too. Done in this final layer on purpose: adding it
+# to the base layer above would bust the cache on the ~20GB metapackage layer
+# and force a multi-hour full rebuild.
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends sudo && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    echo 'operator ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/operator && \
+    chmod 0440 /etc/sudoers.d/operator && \
+    visudo -cf /etc/sudoers.d/operator
+
 WORKDIR /work
 
 # tini reaps zombies from long tool runs; keep the container alive so the MCP
