@@ -39,7 +39,24 @@ podman-compose -f compose.yaml config            # validate compose + .env subst
 - `ai-stack.service` runs `podman-compose up -d`; it is ordered `After=` and
   `Wants=` `kali-sandbox.service`. Containers are named `ai-stack_<svc>_1`.
 - Editing a service's build context (`services/mcp-search`, `services/kali-mcp/mcp`)
-  needs a rebuild: `podman-compose -f compose.yaml build <svc>` then restart.
+  needs a rebuild: `podman-compose -f compose.yaml build <svc>`, then recreate
+  **only that service** (see next bullet) — not a whole-stack restart.
+- **To deploy a change to ONE service, do NOT `systemctl restart ai-stack.service`.**
+  That restart does a full `down`/`up` of every service, and the podman-compose
+  dependency-link quirk (below) can fail the `up` and leave the **whole stack
+  down** (symptom: `executable file 'python3'/'llama-swap' not found in $PATH`).
+  Restart the whole unit only after editing `compose.yaml`/`.env`. For a single
+  service, recreate just it:
+  ```bash
+  podman-compose -f compose.yaml build <svc>          # only if its image changed
+  podman rm -f ai-stack_<svc>_1
+  podman-compose -f compose.yaml up -d --no-deps <svc>
+  podman inspect ai-stack_<svc>_1 --format '{{.Image}}' # confirm it's the NEW image, not the stale one
+  ```
+  If the recreate wedges on `name "ai-stack_<svc>_1" is already in use by <hash>`
+  / `directory not empty` on the overlay `merged`, the container is stuck in
+  storage: `podman unshare rm -rf <storage>/overlay/<HASH>/merged` then
+  `podman rm --force --storage <hash>`, and retry the `up -d --no-deps`.
 
 ## Component-specific gotchas
 
