@@ -85,7 +85,23 @@ def _describe(name: str) -> dict:
     }
 
 
+def _as_text(value) -> str:
+    """Coerce subprocess output to str.
+
+    On timeout, CPython leaves ``TimeoutExpired.stdout``/``.stderr`` as raw
+    *bytes* even when the call used ``text=True`` — the decode step is skipped
+    on the exception path. Concatenating that with a str (as the timeout
+    handler does) raised ``TypeError: can't concat str to bytes``.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        return value.decode("utf-8", "replace")
+    return value
+
+
 def _truncate(text: str) -> str:
+    text = _as_text(text)
     if len(text) <= MAX_OUTPUT:
         return text
     return text[:MAX_OUTPUT] + f"\n\n[... truncated, {len(text) - MAX_OUTPUT} more bytes ...]"
@@ -112,8 +128,8 @@ def _podman_exec(inner_cmd: list[str], timeout: int, workdir: str = "/work") -> 
             "ok": False,
             "exit_code": None,
             "timed_out": True,
-            "stdout": _truncate(e.stdout or ""),
-            "stderr": _truncate((e.stderr or "") + f"\n[killed after {timeout}s]"),
+            "stdout": _truncate(e.stdout),
+            "stderr": _truncate(_as_text(e.stderr) + f"\n[killed after {timeout}s]"),
         }
     except FileNotFoundError:
         return {
